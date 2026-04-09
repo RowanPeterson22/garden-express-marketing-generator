@@ -466,7 +466,17 @@ export default function App() {
             </div>
             <span style={{ ...s.sectionLabel, marginTop: 0 }}>Post type</span>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
-              {postTypes.map(pt => <div key={pt.id} style={s.pill(postType === pt.id)} onClick={() => setPostType(pt.id)}>{pt.label}</div>)}
+              {[
+                { id: 'product', label: 'Product feature', desc: 'Highlights the product benefits' },
+                { id: 'sale', label: 'Sale / promo', desc: 'Focuses on the offer or price' },
+                { id: 'new', label: 'New arrival', desc: 'Announces it as something new' },
+                { id: 'seasonal', label: 'Seasonal', desc: 'Ties to Australian seasons' },
+              ].map(pt => (
+                <div key={pt.id} onClick={() => setPostType(pt.id)} style={{ padding: '8px 14px', border: `1px solid ${postType === pt.id ? BRAND.green : '#e0e8d8'}`, borderRadius: 10, cursor: 'pointer', background: postType === pt.id ? BRAND.green : '#fff', minWidth: 120 }}>
+                  <div style={{ fontSize: 13, fontWeight: 500, color: postType === pt.id ? '#fff' : '#1a1a1a' }}>{pt.label}</div>
+                  <div style={{ fontSize: 11, color: postType === pt.id ? 'rgba(255,255,255,0.75)' : '#999', marginTop: 2 }}>{pt.desc}</div>
+                </div>
+              ))}
             </div>
             <div style={s.infoBox}>Click <strong>Generate captions</strong> — we'll write 3 options using the Garden Express tone of voice.</div>
             <div style={{ display: 'flex', gap: 8, marginBottom: 16, alignItems: 'center' }}>
