@@ -476,7 +476,13 @@ export default function App() {
           <div style={s.card}>
             <input style={s.input} placeholder="Search products..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', margin: '12px 0' }}>
-              {CATEGORIES.map(cat => <div key={cat} style={s.pill(selectedCategory === cat)} onClick={() => setSelectedCategory(cat)}>{cat}</div>)}
+              {CATEGORIES.map(cat => (
+                <div key={cat} style={{
+                  ...s.pill(selectedCategory === cat),
+                  ...(cat === 'Specials' && selectedCategory !== cat ? { borderColor: BRAND.pink, color: BRAND.pink } : {}),
+                  ...(cat === 'Specials' && selectedCategory === cat ? { background: BRAND.pink, borderColor: BRAND.pink } : {}),
+                }} onClick={() => setSelectedCategory(cat)}>{cat}</div>
+              ))}
             </div>
             <div style={s.productGrid}>
               {filteredProducts.map(p => (
