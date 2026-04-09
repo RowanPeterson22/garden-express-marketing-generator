@@ -208,7 +208,9 @@ export default function App() {
         const lw = Math.round(logoImg.naturalWidth * logoScale);
         const lh = Math.round(logoImg.naturalHeight * logoScale);
         const lPad = Math.round(W * 0.04);
-        const lx = logoChoice === 'full' ? Math.round((W - lw) / 2) : W - lw - lPad;
+        const is45 = canvasSize.w === 1080 && canvasSize.h === 1350;
+        const flowerPad = logoChoice === 'flower' && is45 ? Math.round(175 * logoScale) : lPad;
+        const lx = logoChoice === 'full' ? Math.round((W - lw) / 2) : W - lw - flowerPad;
         const ly = H - lh - (canvasSize.h === 1920 ? Math.round(H * 0.08) : lPad);
         ctx.save();
         ctx.filter = 'drop-shadow(2px 3px 4px rgba(0,0,0,0.3))';
@@ -363,7 +365,9 @@ export default function App() {
       if (logoImg.complete && logoImg.naturalWidth > 0) {
         const lPad = Math.round(W * 0.04);
         const lw = logoImg.naturalWidth, lh = logoImg.naturalHeight;
-        const lx = logoChoice === 'full' ? Math.round((W - lw) / 2) : W - lw - lPad;
+        const is45 = W === 1080 && H === 1350;
+        const flowerPad = logoChoice === 'flower' && is45 ? 175 : lPad;
+        const lx = logoChoice === 'full' ? Math.round((W - lw) / 2) : W - lw - flowerPad;
         const ly = H - lh - (H === 1920 ? Math.round(H * 0.08) : lPad);
         fctx.save();
         fctx.filter = 'drop-shadow(2px 3px 4px rgba(0,0,0,0.3))';
