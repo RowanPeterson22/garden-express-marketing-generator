@@ -200,13 +200,14 @@ export default function App() {
       bWords.forEach((w, i) => ctx.fillText(w, bx, by + (i - (bWords.length - 1) / 2) * (bFs * 1.1)));
     }
 
-    // Draw logo on preview only
+    // Draw logo on preview — scale relative to actual canvas width
     if (logoChoice !== 'none') {
       const logoImg = logoChoice === 'full' ? GE_FULL_LOGO_PREVIEW : GE_FLOWER_ICON_PREVIEW;
       if (logoImg.complete && logoImg.naturalWidth > 0) {
+        const logoScale = W / 480;
+        const lw = Math.round(logoImg.naturalWidth * logoScale);
+        const lh = Math.round(logoImg.naturalHeight * logoScale);
         const lPad = Math.round(W * 0.04);
-        const lw = logoImg.naturalWidth;
-        const lh = logoImg.naturalHeight;
         const lx = logoChoice === 'full' ? Math.round((W - lw) / 2) : W - lw - lPad;
         const ly = H - lh - (canvasSize.h === 1920 ? Math.round(H * 0.08) : lPad);
         ctx.save();
