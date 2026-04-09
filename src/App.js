@@ -101,49 +101,6 @@ export default function App() {
   const [logoImg, setLogoImg] = useState(null);
   const canvasRef = useRef(null);
 
-  if (!authed) return <PasswordScreen onUnlock={() => setAuthed(true)} />;
-
-  const sizes = [
-    { w: 1080, h: 1080, label: 'Feed 1:1' },
-    { w: 1080, h: 1350, label: 'Portrait 4:5' },
-    { w: 1080, h: 1920, label: 'Story 9:16' },
-  ];
-
-  const postTypes = [
-    { id: 'product', label: 'Product feature' },
-    { id: 'sale', label: 'Sale / promo' },
-    { id: 'new', label: 'New arrival' },
-    { id: 'seasonal', label: 'Seasonal' },
-  ];
-
-  const filteredProducts = PRODUCTS.filter(p => {
-    const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.cat.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCat = selectedCategory === 'All' || p.cat === selectedCategory;
-    return matchesSearch && matchesCat;
-  });
-
-  const generateCaptions = async () => {
-    if (!selectedProduct) return;
-    setGenerating(true);
-    setGenError('');
-    setCaptions([]);
-    setSelectedCaption('');
-    setEditedCaption('');
-    try {
-      const res = await fetch('/api/generate-captions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ product: selectedProduct.name, price: selectedProduct.price, description: selectedProduct.desc, postType }),
-      });
-      const data = await res.json();
-      if (data.error) throw new Error(data.error);
-      setCaptions(data.captions || []);
-    } catch (e) {
-      setGenError('error');
-    }
-    setGenerating(false);
-  };
-
   const drawCanvas = useCallback(() => {
     if (!canvasRef.current || !selectedProduct) return;
     const cv = canvasRef.current;
@@ -238,6 +195,50 @@ export default function App() {
   }, [selectedProduct, canvasSize, barStyle, overlayText, overlayStyle, overlayPos, overlayBg, overlayFg, selectedBadge, badgeColor, logoImg, logoPos, logoSize, productImg]);
 
   useEffect(() => { if (step === 3) drawCanvas(); }, [step, drawCanvas]);
+
+  if (!authed) return <PasswordScreen onUnlock={() => setAuthed(true)} />;
+
+  const sizes = [
+    { w: 1080, h: 1080, label: 'Feed 1:1' },
+    { w: 1080, h: 1350, label: 'Portrait 4:5' },
+    { w: 1080, h: 1920, label: 'Story 9:16' },
+  ];
+
+  const postTypes = [
+    { id: 'product', label: 'Product feature' },
+    { id: 'sale', label: 'Sale / promo' },
+    { id: 'new', label: 'New arrival' },
+    { id: 'seasonal', label: 'Seasonal' },
+  ];
+
+  const filteredProducts = PRODUCTS.filter(p => {
+    const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.cat.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCat = selectedCategory === 'All' || p.cat === selectedCategory;
+    return matchesSearch && matchesCat;
+  });
+
+  const generateCaptions = async () => {
+    if (!selectedProduct) return;
+    setGenerating(true);
+    setGenError('');
+    setCaptions([]);
+    setSelectedCaption('');
+    setEditedCaption('');
+    try {
+      const res = await fetch('/api/generate-captions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ product: selectedProduct.name, price: selectedProduct.price, description: selectedProduct.desc, postType }),
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      setCaptions(data.captions || []);
+    } catch (e) {
+      setGenError('error');
+    }
+    setGenerating(false);
+  };
+
 
   const handleFileUpload = (e, setter) => {
     const file = e.target.files[0]; if (!file) return;
