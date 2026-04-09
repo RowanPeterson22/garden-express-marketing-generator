@@ -369,7 +369,12 @@ export default function App() {
                 </div>
               </>
             )}
-            {!selectedCaption && <div style={{ marginTop: 12 }}><button style={s.btn('default')} onClick={() => setStep(1)}>Back</button></div>}
+            {!selectedCaption && (
+              <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+                <button style={s.btn('default')} onClick={() => setStep(1)}>Back</button>
+                <button style={s.btn('default')} onClick={() => { setEditedCaption(''); setStep(3); }}>Skip — compose image only</button>
+              </div>
+            )}
           </div>
         )}
 
@@ -383,9 +388,11 @@ export default function App() {
               <div>
                 <span style={{ ...s.sectionLabel, marginTop: 0 }}>Preview</span>
                 <div style={s.canvasWrap}><canvas ref={canvasRef} style={{ display: 'block', borderRadius: 4, maxWidth: '100%', maxHeight: 460 }} /></div>
-                <div style={{ background: '#f7f9f5', border: '1px solid #e0e8d8', borderRadius: 8, padding: '10px 12px', fontSize: 13, color: '#555', lineHeight: 1.6, marginBottom: 12 }}>
-                  <strong>Caption:</strong> {editedCaption}
-                </div>
+                {editedCaption && (
+                  <div style={{ background: '#f7f9f5', border: '1px solid #e0e8d8', borderRadius: 8, padding: '10px 12px', fontSize: 13, color: '#555', lineHeight: 1.6, marginBottom: 12 }}>
+                    <strong>Caption:</strong> {editedCaption}
+                  </div>
+                )}
                 <div style={{ display: 'flex', gap: 8 }}>
                   <button style={s.btn('default')} onClick={() => setStep(2)}>Back</button>
                   <button style={s.btn('primary')} onClick={downloadImage}>Download image</button>
