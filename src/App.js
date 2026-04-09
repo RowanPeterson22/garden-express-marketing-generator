@@ -445,7 +445,7 @@ export default function App() {
             </div>
             <div style={s.productGrid}>
               {filteredProducts.map(p => (
-                <div key={p.id} style={s.productCard(selectedProduct?.id === p.id)} onClick={() => setSelectedProduct(p)}>
+                <div key={p.id} style={s.productCard(selectedProduct?.id === p.id)} onClick={() => { setSelectedProduct(p); setStep(2); }}>
                   <div style={s.pImg}>{p.emoji}</div>
                   <div style={{ fontSize: 11, color: '#aaa', marginBottom: 3 }}>{p.cat}</div>
                   <div style={{ fontSize: 13, fontWeight: 500, marginBottom: 3, lineHeight: 1.3 }}>{p.name}</div>
