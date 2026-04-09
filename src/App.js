@@ -392,7 +392,7 @@ export default function App() {
               <button style={s.btn('primary')} onClick={generateCaptions} disabled={generating}>
                 {generating ? 'Generating...' : captions.length ? 'Regenerate' : 'Generate captions'}
               </button>
-              {genError && <span style={{ fontSize: 13, color: '#c0392b' }}>{genError}</span>}
+              {genError && <span style={{ fontSize: 13, color: '#c0392b' }}>Caption generation is temporarily unavailable — please contact Rowan.</span>}
             </div>
 
             {generating && (
