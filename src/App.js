@@ -230,11 +230,50 @@ export default function App() {
     { w: 1080, h: 1920, label: 'Story 9:16' },
   ];
 
+  const [module, setModule] = useState(null);
+
   const filteredProducts = PRODUCTS.filter(p => {
     const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.cat.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCat = selectedCategory === 'All' || p.cat === selectedCategory;
     return matchesSearch && matchesCat;
   });
+
+  if (!module) return (
+    <div style={{ fontFamily: BRAND.font, minHeight: '100vh', background: '#f7f9f5', color: '#1a1a1a' }}>
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+      <div style={{ background: '#fff', borderBottom: '1px solid #e8e8e0', padding: '0 24px', display: 'flex', alignItems: 'center', height: 56, gap: 12 }}>
+        <div style={{ width: 28, height: 28, borderRadius: '50%', background: BRAND.green, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5"><path d="M12 2a9 9 0 0 1 9 9c0 4.97-9 13-9 13S3 15.97 3 11a9 9 0 0 1 9-9z"/><circle cx="12" cy="11" r="3"/></svg>
+        </div>
+        <span style={{ fontSize: 16, fontWeight: 600 }}>Garden Express</span>
+        <span style={{ fontSize: 13, color: '#888', marginLeft: 4 }}>Marketing Generator</span>
+      </div>
+      <div style={{ maxWidth: 700, margin: '0 auto', padding: '48px 24px' }}>
+        <div style={{ textAlign: 'center', marginBottom: 40 }}>
+          <div style={{ fontSize: 22, fontWeight: 600, marginBottom: 8 }}>What would you like to create?</div>
+          <div style={{ fontSize: 14, color: '#888' }}>Choose a tool to get started</div>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+          <div onClick={() => setModule('social')} style={{ background: '#fff', border: `2px solid ${BRAND.green}`, borderRadius: 16, padding: '32px 24px', cursor: 'pointer', textAlign: 'center' }}
+            onMouseEnter={e => e.currentTarget.style.background = '#f0f9e8'}
+            onMouseLeave={e => e.currentTarget.style.background = '#fff'}>
+            <div style={{ fontSize: 40, marginBottom: 16 }}>📱</div>
+            <div style={{ fontSize: 17, fontWeight: 600, color: '#1a1a1a', marginBottom: 8 }}>Social post creator</div>
+            <div style={{ fontSize: 13, color: '#888', lineHeight: 1.5 }}>Generate captions and compose branded images for Facebook and Instagram</div>
+            <div style={{ marginTop: 20, display: 'inline-block', background: BRAND.green, color: '#fff', borderRadius: 8, padding: '8px 20px', fontSize: 14, fontWeight: 500 }}>Get started →</div>
+          </div>
+          <div style={{ background: '#fff', border: '1px solid #e0e8d8', borderRadius: 16, padding: '32px 24px', textAlign: 'center', opacity: 0.6, cursor: 'not-allowed' }}>
+            <div style={{ fontSize: 40, marginBottom: 16 }}>✉️</div>
+            <div style={{ fontSize: 17, fontWeight: 600, color: '#1a1a1a', marginBottom: 8 }}>Email image generator</div>
+            <div style={{ fontSize: 13, color: '#888', lineHeight: 1.5 }}>Compose newsletter images and sections for Mailchimp and Klaviyo</div>
+            <div style={{ marginTop: 20, display: 'inline-block', background: '#e0e8d8', color: '#888', borderRadius: 8, padding: '8px 20px', fontSize: 14, fontWeight: 500 }}>Coming soon</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 
   const generateCaptions = async () => {
     if (!selectedProduct) return;
@@ -419,7 +458,8 @@ export default function App() {
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5"><path d="M12 2a9 9 0 0 1 9 9c0 4.97-9 13-9 13S3 15.97 3 11a9 9 0 0 1 9-9z"/><circle cx="12" cy="11" r="3"/></svg>
         </div>
         <span style={{ fontSize: 16, fontWeight: 600, color: '#1a1a1a' }}>Garden Express</span>
-        <span style={{ fontSize: 13, color: '#888', marginLeft: 4 }}>Social & Newsletter Generator</span>
+        <span style={{ fontSize: 13, color: '#888', marginLeft: 4 }}>Social post creator</span>
+        <div style={{ marginLeft: 'auto', fontSize: 13, color: '#aaa', cursor: 'pointer' }} onClick={() => { setModule(null); setStep(1); setSelectedProduct(null); }}>← All tools</div>
       </div>
       <div style={s.main}>
         <div style={s.stepBar}>
