@@ -11,7 +11,7 @@ const BRAND = {
 const PRODUCTS = [
   { id: 1, name: 'Crimson Queen Japanese Maple', cat: 'Trees', price: '$89.00', desc: 'Stunning laceleaf Japanese maple with deep crimson foliage. Perfect for containers or garden beds.', emoji: '🍁' },
   { id: 2, name: 'Lavender Hidcote', cat: 'Perennials', price: '$14.95', desc: 'Classic English lavender with deep purple flowers and strong fragrance. Drought tolerant once established.', emoji: '💜' },
-  { id: 3, name: 'Iceberg Rose', cat: 'Roses', price: '$24.95', desc: 'Australia\'s most popular rose. Pure white blooms all season, disease resistant and easy to grow.', emoji: '🌹' },
+  { id: 3, name: 'Iceberg Rose', cat: 'Roses', price: '$24.95', desc: "Australia's most popular rose. Pure white blooms all season, disease resistant and easy to grow.", emoji: '🌹' },
   { id: 4, name: 'Lilly Pilly Resilience', cat: 'Hedging', price: '$19.95', desc: 'Fast growing native hedge plant with glossy foliage and psyllid resistance. Great for privacy screens.', emoji: '🌿' },
   { id: 5, name: 'Buxus Sempervirens', cat: 'Hedging', price: '$16.95', desc: 'Classic English box hedge. Dense evergreen foliage, ideal for formal gardens and topiary.', emoji: '🌳' },
   { id: 6, name: 'Agapanthus Storm Cloud', cat: 'Perennials', price: '$18.95', desc: 'Deep violet-blue flowers on tall stems. Perfect for mass planting or as a border plant.', emoji: '💙' },
@@ -20,14 +20,62 @@ const PRODUCTS = [
   { id: 9, name: 'Garlic Bulbs (10 pack)', cat: 'Edibles', price: '$12.95', desc: 'Premium Australian grown garlic bulbs. Plant now for a bumper summer harvest.', emoji: '🧄' },
   { id: 10, name: 'Blueberry Sunshine Blue', cat: 'Edibles', price: '$34.95', desc: 'Compact blueberry perfect for pots or small gardens. Self-fertile with masses of sweet berries.', emoji: '🫐' },
   { id: 11, name: 'Potting Mix Premium 30L', cat: 'Soils & Mulch', price: '$18.95', desc: 'Professional grade potting mix with controlled release fertiliser. Perfect for containers and raised beds.', emoji: '🪴' },
-  { id: 12, name: 'Seasol Concentrate 1L', cat: 'Fertilisers', price: '$22.95', desc: 'Australia\'s favourite garden tonic. Improves soil health and plant resilience naturally.', emoji: '🌱' },
+  { id: 12, name: 'Seasol Concentrate 1L', cat: 'Fertilisers', price: '$22.95', desc: "Australia's favourite garden tonic. Improves soil health and plant resilience naturally.", emoji: '🌱' },
 ];
 
 const CATEGORIES = ['All', ...new Set(PRODUCTS.map(p => p.cat))];
-
 const BADGE_COLORS = { green: '#70b738', pink: '#ab0a62', amber: '#d68910', navy: '#1a3a5c' };
 
+function PasswordScreen({ onUnlock }) {
+  const [input, setInput] = useState('');
+  const [error, setError] = useState(false);
+  const [shake, setShake] = useState(false);
+
+  const handleSubmit = () => {
+    if (input === process.env.REACT_APP_PASSWORD) {
+      sessionStorage.setItem('ge_auth', 'true');
+      onUnlock();
+    } else {
+      setError(true);
+      setShake(true);
+      setTimeout(() => setShake(false), 500);
+      setTimeout(() => setError(false), 2000);
+      setInput('');
+    }
+  };
+
+  return (
+    <div style={{ minHeight: '100vh', background: '#f7f9f5', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: BRAND.font }}>
+      <style>{`@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}`}</style>
+      <div style={{ background: '#fff', border: '1px solid #e0e8d8', borderRadius: 16, padding: '40px 36px', width: '100%', maxWidth: 380, textAlign: 'center' }}>
+        <div style={{ width: 52, height: 52, borderRadius: '50%', background: BRAND.green, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5"><path d="M12 2a9 9 0 0 1 9 9c0 4.97-9 13-9 13S3 15.97 3 11a9 9 0 0 1 9-9z"/><circle cx="12" cy="11" r="3"/></svg>
+        </div>
+        <div style={{ fontSize: 20, fontWeight: 600, marginBottom: 4, color: '#1a1a1a' }}>Garden Express</div>
+        <div style={{ fontSize: 14, color: '#888', marginBottom: 28 }}>Social & Newsletter Generator</div>
+        <div style={{ animation: shake ? 'shake 0.5s ease' : 'none' }}>
+          <input
+            type="password"
+            placeholder="Enter staff password"
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && handleSubmit()}
+            autoFocus
+            style={{ width: '100%', padding: '11px 14px', fontSize: 15, border: `1px solid ${error ? '#e05555' : '#e0e8d8'}`, borderRadius: 8, marginBottom: 12, fontFamily: BRAND.font, outline: 'none', textAlign: 'center', letterSpacing: 2, color: '#1a1a1a' }}
+          />
+          {error && <div style={{ fontSize: 13, color: '#e05555', marginBottom: 8 }}>Incorrect password — try again</div>}
+          <button onClick={handleSubmit} style={{ width: '100%', padding: 11, background: BRAND.green, color: '#fff', border: 'none', borderRadius: 8, fontSize: 15, fontWeight: 500, cursor: 'pointer', fontFamily: BRAND.font }}>
+            Sign in
+          </button>
+        </div>
+        <div style={{ fontSize: 12, color: '#ccc', marginTop: 20 }}>Staff access only</div>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
+  const [authed, setAuthed] = useState(() => sessionStorage.getItem('ge_auth') === 'true');
   const [step, setStep] = useState(1);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -53,6 +101,8 @@ export default function App() {
   const [logoImg, setLogoImg] = useState(null);
   const canvasRef = useRef(null);
 
+  if (!authed) return <PasswordScreen onUnlock={() => setAuthed(true)} />;
+
   const sizes = [
     { w: 1080, h: 1080, label: 'Feed 1:1' },
     { w: 1080, h: 1350, label: 'Portrait 4:5' },
@@ -67,8 +117,7 @@ export default function App() {
   ];
 
   const filteredProducts = PRODUCTS.filter(p => {
-    const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.cat.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.cat.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCat = selectedCategory === 'All' || p.cat === selectedCategory;
     return matchesSearch && matchesCat;
   });
@@ -84,18 +133,13 @@ export default function App() {
       const res = await fetch('/api/generate-captions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          product: selectedProduct.name,
-          price: selectedProduct.price,
-          description: selectedProduct.desc,
-          postType,
-        }),
+        body: JSON.stringify({ product: selectedProduct.name, price: selectedProduct.price, description: selectedProduct.desc, postType }),
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       setCaptions(data.captions || []);
     } catch (e) {
-      setGenError('Could not generate captions — ' + e.message);
+      setGenError('error');
     }
     setGenerating(false);
   };
@@ -121,35 +165,26 @@ export default function App() {
       ctx.fillText(selectedProduct.emoji, W / 2, H * 0.44);
     }
 
-    const bH = Math.round(H * 0.2);
-    const pad = Math.round(W * 0.05);
+    const bH = Math.round(H * 0.2), pad = Math.round(W * 0.05);
 
     if (barStyle === 'bottom' || barStyle === 'top') {
       const y = barStyle === 'bottom' ? H - bH : 0;
       ctx.fillStyle = 'rgba(30,70,10,0.9)';
       ctx.fillRect(0, y, W, bH);
-      ctx.textAlign = 'left';
-      ctx.textBaseline = 'top';
-      ctx.font = `500 ${Math.round(W * 0.052)}px Inter, sans-serif`;
-      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+      ctx.font = `500 ${Math.round(W * 0.052)}px Inter, sans-serif`; ctx.fillStyle = '#fff';
       ctx.fillText(selectedProduct.name, pad, y + Math.round(bH * 0.1), W - pad * 2);
-      ctx.font = `${Math.round(W * 0.042)}px Inter, sans-serif`;
-      ctx.fillStyle = '#b8e87a';
+      ctx.font = `${Math.round(W * 0.042)}px Inter, sans-serif`; ctx.fillStyle = '#b8e87a';
       ctx.fillText(selectedProduct.price, pad, y + Math.round(bH * 0.45));
-      ctx.font = `${Math.round(W * 0.028)}px Inter, sans-serif`;
-      ctx.fillStyle = 'rgba(255,255,255,0.55)';
+      ctx.font = `${Math.round(W * 0.028)}px Inter, sans-serif`; ctx.fillStyle = 'rgba(255,255,255,0.55)';
       ctx.fillText('Garden Express', pad, y + Math.round(bH * 0.72));
     } else if (barStyle === 'minimal') {
       const sH = Math.round(bH * 0.6);
-      ctx.fillStyle = 'rgba(0,0,0,0.4)';
-      ctx.fillRect(0, H - sH, W, sH);
-      ctx.textAlign = 'left';
-      ctx.textBaseline = 'top';
-      ctx.font = `500 ${Math.round(W * 0.05)}px Inter, sans-serif`;
-      ctx.fillStyle = '#ffffff';
+      ctx.fillStyle = 'rgba(0,0,0,0.4)'; ctx.fillRect(0, H - sH, W, sH);
+      ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+      ctx.font = `500 ${Math.round(W * 0.05)}px Inter, sans-serif`; ctx.fillStyle = '#fff';
       ctx.fillText(selectedProduct.name, pad, H - sH + Math.round(sH * 0.1), W - pad * 2);
-      ctx.font = `${Math.round(W * 0.028)}px Inter, sans-serif`;
-      ctx.fillStyle = 'rgba(255,255,255,0.65)';
+      ctx.font = `${Math.round(W * 0.028)}px Inter, sans-serif`; ctx.fillStyle = 'rgba(255,255,255,0.65)';
       ctx.fillText('Garden Express · ' + selectedProduct.price, pad, H - sH + Math.round(sH * 0.55));
     }
 
@@ -158,101 +193,56 @@ export default function App() {
       ctx.font = `500 ${oFs}px Inter, sans-serif`;
       const tw = ctx.measureText(overlayText).width;
       const oPad = Math.round(W * 0.04);
-      let oy;
-      if (overlayPos === 'top') oy = Math.round(H * 0.06);
-      else if (overlayPos === 'mid') oy = Math.round(H * 0.5) - Math.round(oFs * 0.5);
-      else oy = Math.round(H * 0.82);
-
+      let oy = overlayPos === 'top' ? Math.round(H * 0.06) : overlayPos === 'mid' ? Math.round(H * 0.5) - Math.round(oFs * 0.5) : Math.round(H * 0.82);
       if (overlayStyle === 'banner') {
-        ctx.fillStyle = overlayBg;
-        ctx.fillRect(0, oy - oPad, W, oFs + oPad * 2);
-        ctx.fillStyle = overlayFg;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'top';
+        ctx.fillStyle = overlayBg; ctx.fillRect(0, oy - oPad, W, oFs + oPad * 2);
+        ctx.fillStyle = overlayFg; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
         ctx.fillText(overlayText, W / 2, oy);
       } else if (overlayStyle === 'pill') {
         const ox = W / 2 - (tw / 2 + oPad * 1.2);
-        ctx.fillStyle = overlayBg;
-        ctx.beginPath();
-        ctx.roundRect(ox, oy - oPad * 0.8, tw + oPad * 2.4, oFs + oPad * 1.6, oFs);
-        ctx.fill();
-        ctx.fillStyle = overlayFg;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'top';
+        ctx.fillStyle = overlayBg; ctx.beginPath(); ctx.roundRect(ox, oy - oPad * 0.8, tw + oPad * 2.4, oFs + oPad * 1.6, oFs); ctx.fill();
+        ctx.fillStyle = overlayFg; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
         ctx.fillText(overlayText, W / 2, oy);
       } else {
         const r = Math.round(Math.min(W, H) * 0.12);
         const ox = W - r - Math.round(W * 0.06);
         const burstY = overlayPos === 'top' ? r + Math.round(H * 0.06) : H - r - Math.round(H * 0.06);
-        ctx.fillStyle = overlayBg;
-        ctx.beginPath();
-        for (let i = 0; i < 16; i++) {
-          const a = (i / 16) * Math.PI * 2 - Math.PI / 2;
-          const ri = i % 2 === 0 ? r : r * 0.75;
-          const x = ox + Math.cos(a) * ri, y = burstY + Math.sin(a) * ri;
-          i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-        }
-        ctx.closePath();
-        ctx.fill();
-        const words = overlayText.split(' ');
-        ctx.fillStyle = overlayFg;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
+        ctx.fillStyle = overlayBg; ctx.beginPath();
+        for (let i = 0; i < 16; i++) { const a = (i / 16) * Math.PI * 2 - Math.PI / 2; const ri = i % 2 === 0 ? r : r * 0.75; i === 0 ? ctx.moveTo(ox + Math.cos(a) * ri, burstY + Math.sin(a) * ri) : ctx.lineTo(ox + Math.cos(a) * ri, burstY + Math.sin(a) * ri); }
+        ctx.closePath(); ctx.fill();
+        ctx.fillStyle = overlayFg; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
         ctx.font = `500 ${Math.round(oFs * 0.72)}px Inter, sans-serif`;
-        words.forEach((w, i) => ctx.fillText(w, ox, burstY + (i - (words.length - 1) / 2) * (oFs * 0.9)));
+        overlayText.split(' ').forEach((w, i, arr) => ctx.fillText(w, ox, burstY + (i - (arr.length - 1) / 2) * (oFs * 0.9)));
       }
     }
 
     if (selectedBadge) {
       const bc = BADGE_COLORS[badgeColor] || BADGE_COLORS.green;
       const br = Math.round(Math.min(W, H) * 0.11);
-      const bx = W - br - Math.round(W * 0.04);
-      const by = br + Math.round(H * 0.04);
-      ctx.fillStyle = bc;
-      ctx.beginPath();
-      for (let i = 0; i < 16; i++) {
-        const a = (i / 16) * Math.PI * 2 - Math.PI / 2;
-        const ri = i % 2 === 0 ? br : br * 0.78;
-        const x = bx + Math.cos(a) * ri, y = by + Math.sin(a) * ri;
-        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-      }
-      ctx.closePath();
-      ctx.fill();
-      ctx.fillStyle = '#ffffff';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      const bWords = selectedBadge.toUpperCase().split(' ');
-      const bFs = Math.round(br * 0.36);
+      const bx = W - br - Math.round(W * 0.04), by = br + Math.round(H * 0.04);
+      ctx.fillStyle = bc; ctx.beginPath();
+      for (let i = 0; i < 16; i++) { const a = (i / 16) * Math.PI * 2 - Math.PI / 2; const ri = i % 2 === 0 ? br : br * 0.78; i === 0 ? ctx.moveTo(bx + Math.cos(a) * ri, by + Math.sin(a) * ri) : ctx.lineTo(bx + Math.cos(a) * ri, by + Math.sin(a) * ri); }
+      ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      const bWords = selectedBadge.toUpperCase().split(' '), bFs = Math.round(br * 0.36);
       ctx.font = `500 ${bFs}px Inter, sans-serif`;
       bWords.forEach((w, i) => ctx.fillText(w, bx, by + (i - (bWords.length - 1) / 2) * (bFs * 1.1)));
     }
 
     if (logoImg) {
-      const lw = Math.round(W * (logoSize / 100));
-      const lh = Math.round(lw * (logoImg.height / logoImg.width));
-      const lPad = Math.round(W * 0.03);
-      let lx, ly;
-      if (logoPos === 'tr') { lx = W - lw - lPad; ly = lPad; }
-      else if (logoPos === 'tl') { lx = lPad; ly = lPad; }
-      else if (logoPos === 'br') { lx = W - lw - lPad; ly = H - lh - lPad; }
-      else { lx = lPad; ly = H - lh - lPad; }
+      const lw = Math.round(W * (logoSize / 100)), lh = Math.round(lw * (logoImg.height / logoImg.width)), lPad = Math.round(W * 0.03);
+      const lx = logoPos === 'tr' || logoPos === 'br' ? W - lw - lPad : lPad;
+      const ly = logoPos === 'tr' || logoPos === 'tl' ? lPad : H - lh - lPad;
       ctx.drawImage(logoImg, lx, ly, lw, lh);
     }
   }, [selectedProduct, canvasSize, barStyle, overlayText, overlayStyle, overlayPos, overlayBg, overlayFg, selectedBadge, badgeColor, logoImg, logoPos, logoSize, productImg]);
 
-  useEffect(() => {
-    if (step === 3) drawCanvas();
-  }, [step, drawCanvas]);
+  useEffect(() => { if (step === 3) drawCanvas(); }, [step, drawCanvas]);
 
   const handleFileUpload = (e, setter) => {
-    const file = e.target.files[0];
-    if (!file) return;
+    const file = e.target.files[0]; if (!file) return;
     const reader = new FileReader();
-    reader.onload = ev => {
-      const img = new Image();
-      img.onload = () => { setter(img); };
-      img.src = ev.target.result;
-    };
+    reader.onload = ev => { const img = new Image(); img.onload = () => { setter(img); }; img.src = ev.target.result; };
     reader.readAsDataURL(file);
   };
 
@@ -260,55 +250,39 @@ export default function App() {
     if (!canvasRef.current || !selectedProduct) return;
     const cv = canvasRef.current;
     const full = document.createElement('canvas');
-    full.width = canvasSize.w;
-    full.height = canvasSize.h;
+    full.width = canvasSize.w; full.height = canvasSize.h;
     full.getContext('2d').drawImage(cv, 0, 0, canvasSize.w, canvasSize.h);
     const dataUrl = full.toDataURL('image/png');
     try {
       const arr = dataUrl.split(','), mime = arr[0].match(/:(.*?);/)[1], b = atob(arr[1]);
-      let n = b.length;
-      const u = new Uint8Array(n);
-      while (n--) u[n] = b.charCodeAt(n);
-      const blob = new Blob([u], { type: mime });
-      const bUrl = URL.createObjectURL(blob);
+      let n = b.length; const u = new Uint8Array(n); while (n--) u[n] = b.charCodeAt(n);
+      const blob = new Blob([u], { type: mime }), bUrl = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href = bUrl;
-      a.download = selectedProduct.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') + `-${canvasSize.w}x${canvasSize.h}.png`;
-      document.body.appendChild(a);
-      a.click();
+      a.href = bUrl; a.download = selectedProduct.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') + `-${canvasSize.w}x${canvasSize.h}.png`;
+      document.body.appendChild(a); a.click();
       setTimeout(() => { URL.revokeObjectURL(bUrl); document.body.removeChild(a); }, 1000);
-    } catch (e) {
-      alert('Download failed — try right-clicking the preview and saving the image.');
-    }
+    } catch (e) { alert('Download failed — try right-clicking the preview and saving the image.'); }
   };
 
   const s = {
     app: { fontFamily: BRAND.font, minHeight: '100vh', background: '#f7f9f5', color: '#1a1a1a' },
     header: { background: '#fff', borderBottom: '1px solid #e8e8e0', padding: '0 24px', display: 'flex', alignItems: 'center', height: 56, gap: 12 },
     headerDot: { width: 28, height: 28, borderRadius: '50%', background: BRAND.green, display: 'flex', alignItems: 'center', justifyContent: 'center' },
-    headerTitle: { fontSize: 16, fontWeight: 600, color: '#1a1a1a' },
-    headerSub: { fontSize: 13, color: '#888', marginLeft: 4 },
     main: { maxWidth: 1000, margin: '0 auto', padding: '24px 16px' },
     stepBar: { display: 'flex', marginBottom: 24, border: '1px solid #e0e8d8', borderRadius: 12, overflow: 'hidden', background: '#fff' },
-    step: (active, done) => ({ flex: 1, padding: '11px 8px', textAlign: 'center', fontSize: 13, color: done ? BRAND.green : active ? '#1a1a1a' : '#999', background: active ? '#fff' : '#f7f9f5', fontWeight: active ? 500 : 400, borderRight: '1px solid #e0e8d8', cursor: 'pointer' }),
-    card: { background: '#fff', border: '1px solid #e0e8d8', borderRadius: 14, padding: '20px 20px' },
+    step: (active, done) => ({ flex: 1, padding: '11px 8px', textAlign: 'center', fontSize: 13, color: done ? BRAND.green : active ? '#1a1a1a' : '#999', background: active ? '#fff' : '#f7f9f5', fontWeight: active ? 500 : 400, borderRight: '1px solid #e0e8d8' }),
+    card: { background: '#fff', border: '1px solid #e0e8d8', borderRadius: 14, padding: 20 },
     sectionLabel: { fontSize: 13, fontWeight: 500, color: '#666', marginBottom: 8, marginTop: 16, display: 'block' },
     input: { width: '100%', padding: '9px 12px', fontSize: 14, border: '1px solid #e0e8d8', borderRadius: 8, fontFamily: BRAND.font, color: '#1a1a1a', background: '#fff', outline: 'none' },
     pill: (active) => ({ padding: '6px 14px', border: `1px solid ${active ? BRAND.green : '#e0e8d8'}`, borderRadius: 20, fontSize: 13, cursor: 'pointer', background: active ? BRAND.green : '#fff', color: active ? '#fff' : '#666', fontFamily: BRAND.font }),
-    btn: (variant) => ({
-      padding: '10px 20px', border: `1px solid ${variant === 'primary' ? BRAND.green : variant === 'pink' ? BRAND.pink : '#ccc'}`,
-      borderRadius: 8, background: variant === 'primary' ? BRAND.green : variant === 'pink' ? BRAND.pink : '#fff',
-      color: variant === 'primary' || variant === 'pink' ? '#fff' : '#666',
-      fontSize: 14, cursor: 'pointer', fontFamily: BRAND.font, fontWeight: 500
-    }),
+    btn: (variant) => ({ padding: '10px 20px', border: `1px solid ${variant === 'primary' ? BRAND.green : '#ccc'}`, borderRadius: 8, background: variant === 'primary' ? BRAND.green : '#fff', color: variant === 'primary' ? '#fff' : '#666', fontSize: 14, cursor: 'pointer', fontFamily: BRAND.font, fontWeight: 500 }),
     productGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 12, marginBottom: 16 },
-    productCard: (selected) => ({ border: `${selected ? 2 : 1}px solid ${selected ? BRAND.green : '#e0e8d8'}`, borderRadius: 12, padding: 12, cursor: 'pointer', background: '#fff' }),
-    pImg: { width: '100%', aspectRatio: '1', borderRadius: 8, background: '#f0f5e8', marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, overflow: 'hidden' },
+    productCard: (sel) => ({ border: `${sel ? 2 : 1}px solid ${sel ? BRAND.green : '#e0e8d8'}`, borderRadius: 12, padding: 12, cursor: 'pointer', background: '#fff' }),
+    pImg: { width: '100%', aspectRatio: '1', borderRadius: 8, background: '#f0f5e8', marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32 },
     selBar: { background: '#f0f5e8', border: '1px solid #d4e8b8', borderRadius: 8, padding: '10px 14px', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, flexWrap: 'wrap' },
     tag: (color) => ({ fontSize: 11, padding: '3px 8px', borderRadius: 10, background: color === 'pink' ? '#fce8f3' : '#e8f5d4', color: color === 'pink' ? BRAND.pink : BRAND.darkGreen, fontWeight: 500 }),
-    captionCard: (selected) => ({ border: `${selected ? 2 : 1}px solid ${selected ? BRAND.green : '#e0e8d8'}`, borderRadius: 12, padding: '12px 14px', marginBottom: 8, cursor: 'pointer', fontSize: 14, lineHeight: 1.6, color: '#1a1a1a', background: '#fff' }),
+    captionCard: (sel) => ({ border: `${sel ? 2 : 1}px solid ${sel ? BRAND.green : '#e0e8d8'}`, borderRadius: 12, padding: '12px 14px', marginBottom: 8, cursor: 'pointer', fontSize: 14, lineHeight: 1.6, color: '#1a1a1a', background: '#fff' }),
     textarea: { width: '100%', minHeight: 90, padding: '10px 12px', fontSize: 14, border: '1px solid #e0e8d8', borderRadius: 8, fontFamily: BRAND.font, lineHeight: 1.6, resize: 'vertical', color: '#1a1a1a' },
-    composer: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'start' },
     controlSection: { border: '1px solid #e0e8d8', borderRadius: 12, padding: 14, background: '#fff', marginBottom: 10 },
     canvasWrap: { border: '1px solid #e0e8d8', borderRadius: 12, overflow: 'hidden', background: '#1a1a1a', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 12, marginBottom: 12 },
     uploadLabel: { display: 'block', padding: '8px 14px', border: '1px dashed #ccc', borderRadius: 8, fontSize: 13, cursor: 'pointer', color: '#888', textAlign: 'center', width: '100%' },
@@ -323,15 +297,13 @@ export default function App() {
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
-
       <div style={s.header}>
         <div style={s.headerDot}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5"><path d="M12 2a9 9 0 0 1 9 9c0 4.97-9 13-9 13S3 15.97 3 11a9 9 0 0 1 9-9z"/><circle cx="12" cy="11" r="3"/></svg>
         </div>
-        <span style={s.headerTitle}>Garden Express</span>
-        <span style={s.headerSub}>Social & Newsletter Generator</span>
+        <span style={{ fontSize: 16, fontWeight: 600, color: '#1a1a1a' }}>Garden Express</span>
+        <span style={{ fontSize: 13, color: '#888', marginLeft: 4 }}>Social & Newsletter Generator</span>
       </div>
-
       <div style={s.main}>
         <div style={s.stepBar}>
           {['Pick product', 'Write copy', 'Compose image'].map((label, i) => (
@@ -341,14 +313,11 @@ export default function App() {
           ))}
         </div>
 
-        {/* STEP 1 */}
         {step === 1 && (
           <div style={s.card}>
             <input style={s.input} placeholder="Search products..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', margin: '12px 0' }}>
-              {CATEGORIES.map(cat => (
-                <div key={cat} style={s.pill(selectedCategory === cat)} onClick={() => setSelectedCategory(cat)}>{cat}</div>
-              ))}
+              {CATEGORIES.map(cat => <div key={cat} style={s.pill(selectedCategory === cat)} onClick={() => setSelectedCategory(cat)}>{cat}</div>)}
             </div>
             <div style={s.productGrid}>
               {filteredProducts.map(p => (
@@ -360,15 +329,10 @@ export default function App() {
                 </div>
               ))}
             </div>
-            <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-              <button style={s.btn('primary')} onClick={() => { if (!selectedProduct) { alert('Please select a product first.'); return; } setStep(2); }}>
-                Next: write copy →
-              </button>
-            </div>
+            <button style={s.btn('primary')} onClick={() => { if (!selectedProduct) { alert('Please select a product first.'); return; } setStep(2); }}>Next: write copy →</button>
           </div>
         )}
 
-        {/* STEP 2 */}
         {step === 2 && (
           <div style={s.card}>
             <div style={s.selBar}>
@@ -376,76 +340,48 @@ export default function App() {
               <span style={s.tag('green')}>{selectedProduct?.cat}</span>
               <span style={s.tag('pink')}>{selectedProduct?.price}</span>
             </div>
-
             <span style={{ ...s.sectionLabel, marginTop: 0 }}>Post type</span>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
-              {postTypes.map(pt => (
-                <div key={pt.id} style={s.pill(postType === pt.id)} onClick={() => setPostType(pt.id)}>{pt.label}</div>
-              ))}
+              {postTypes.map(pt => <div key={pt.id} style={s.pill(postType === pt.id)} onClick={() => setPostType(pt.id)}>{pt.label}</div>)}
             </div>
-
-            <div style={s.infoBox}>
-              Click <strong>Generate captions</strong> — Claude will write 3 options using the Garden Express tone of voice.
-            </div>
-
+            <div style={s.infoBox}>Click <strong>Generate captions</strong> — Claude will write 3 options using the Garden Express tone of voice.</div>
             <div style={{ display: 'flex', gap: 8, marginBottom: 16, alignItems: 'center' }}>
               <button style={s.btn('primary')} onClick={generateCaptions} disabled={generating}>
                 {generating ? 'Generating...' : captions.length ? 'Regenerate' : 'Generate captions'}
               </button>
               {genError && <span style={{ fontSize: 13, color: '#c0392b' }}>Caption generation is temporarily unavailable — please contact Rowan.</span>}
             </div>
-
-            {generating && (
-              <div style={{ textAlign: 'center', padding: '24px', color: '#888', fontSize: 14 }}>
-                Writing captions in the Garden Express voice...
-              </div>
-            )}
-
+            {generating && <div style={{ textAlign: 'center', padding: 24, color: '#888', fontSize: 14 }}>Writing captions in the Garden Express voice...</div>}
             {captions.length > 0 && (
               <>
                 <span style={s.sectionLabel}>Choose a caption</span>
-                {captions.map((c, i) => (
-                  <div key={i} style={s.captionCard(selectedCaption === c)} onClick={() => { setSelectedCaption(c); setEditedCaption(c); }}>
-                    {c}
-                  </div>
-                ))}
+                {captions.map((c, i) => <div key={i} style={s.captionCard(selectedCaption === c)} onClick={() => { setSelectedCaption(c); setEditedCaption(c); }}>{c}</div>)}
               </>
             )}
-
             {selectedCaption && (
               <>
                 <span style={s.sectionLabel}>Edit caption</span>
                 <textarea style={s.textarea} value={editedCaption} onChange={e => setEditedCaption(e.target.value)} />
                 <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
                   <button style={s.btn('default')} onClick={() => setStep(1)}>Back</button>
-                  <button style={s.btn('primary')} onClick={() => { if (!editedCaption.trim()) { alert('Please select or write a caption.'); return; } setStep(3); }}>
-                    Next: compose image →
-                  </button>
+                  <button style={s.btn('primary')} onClick={() => { if (!editedCaption.trim()) { alert('Please select or write a caption.'); return; } setStep(3); }}>Next: compose image →</button>
                 </div>
               </>
             )}
-
-            {!selectedCaption && (
-              <div style={{ marginTop: 12 }}>
-                <button style={s.btn('default')} onClick={() => setStep(1)}>Back</button>
-              </div>
-            )}
+            {!selectedCaption && <div style={{ marginTop: 12 }}><button style={s.btn('default')} onClick={() => setStep(1)}>Back</button></div>}
           </div>
         )}
 
-        {/* STEP 3 */}
         {step === 3 && (
           <div style={s.card}>
             <div style={s.selBar}>
               <strong>{selectedProduct?.name}</strong>
               <span style={s.tag('pink')}>{selectedProduct?.price}</span>
             </div>
-            <div style={{ ...s.composer, gridTemplateColumns: window.innerWidth < 640 ? '1fr' : '1fr 1fr' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth < 640 ? '1fr' : '1fr 1fr', gap: 20, alignItems: 'start' }}>
               <div>
                 <span style={{ ...s.sectionLabel, marginTop: 0 }}>Preview</span>
-                <div style={s.canvasWrap}>
-                  <canvas ref={canvasRef} style={{ display: 'block', borderRadius: 4, maxWidth: '100%', maxHeight: 460 }} />
-                </div>
+                <div style={s.canvasWrap}><canvas ref={canvasRef} style={{ display: 'block', borderRadius: 4, maxWidth: '100%', maxHeight: 460 }} /></div>
                 <div style={{ background: '#f7f9f5', border: '1px solid #e0e8d8', borderRadius: 8, padding: '10px 12px', fontSize: 13, color: '#555', lineHeight: 1.6, marginBottom: 12 }}>
                   <strong>Caption:</strong> {editedCaption}
                 </div>
@@ -454,28 +390,23 @@ export default function App() {
                   <button style={s.btn('primary')} onClick={downloadImage}>Download image</button>
                 </div>
               </div>
-
               <div>
                 <div style={s.controlSection}>
                   <span style={{ ...s.sectionLabel, marginTop: 0 }}>Canvas size</span>
                   <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                    {sizes.map(sz => (
-                      <div key={sz.label} style={s.pill(canvasSize.label === sz.label)} onClick={() => { setCanvasSize(sz); setTimeout(drawCanvas, 50); }}>{sz.label}</div>
-                    ))}
+                    {sizes.map(sz => <div key={sz.label} style={s.pill(canvasSize.label === sz.label)} onClick={() => { setCanvasSize(sz); setTimeout(drawCanvas, 50); }}>{sz.label}</div>)}
                   </div>
                 </div>
-
                 <div style={s.controlSection}>
                   <span style={{ ...s.sectionLabel, marginTop: 0 }}>Product image</span>
                   <label style={s.uploadLabel} htmlFor="productImg">Upload product photo</label>
-                  <input type="file" id="productImg" accept="image/*" style={{ display: 'none' }} onChange={e => { handleFileUpload(e, img => { setProductImg(img); setTimeout(drawCanvas, 50); }); }} />
+                  <input type="file" id="productImg" accept="image/*" style={{ display: 'none' }} onChange={e => handleFileUpload(e, img => { setProductImg(img); setTimeout(drawCanvas, 50); })} />
                   {productImg && <div style={{ fontSize: 12, color: BRAND.green, marginTop: 6 }}>Image loaded ✓</div>}
                 </div>
-
                 <div style={s.controlSection}>
                   <span style={{ ...s.sectionLabel, marginTop: 0 }}>Logo</span>
                   <label style={s.uploadLabel} htmlFor="logoImg">Upload logo (PNG with transparency)</label>
-                  <input type="file" id="logoImg" accept="image/*" style={{ display: 'none' }} onChange={e => { handleFileUpload(e, img => { setLogoImg(img); setTimeout(drawCanvas, 50); }); }} />
+                  <input type="file" id="logoImg" accept="image/*" style={{ display: 'none' }} onChange={e => handleFileUpload(e, img => { setLogoImg(img); setTimeout(drawCanvas, 50); })} />
                   {logoImg && <div style={{ fontSize: 12, color: BRAND.green, marginTop: 6 }}>Logo loaded ✓</div>}
                   <div style={s.row2}>
                     <span style={{ fontSize: 12, color: '#666' }}>Position</span>
@@ -489,7 +420,6 @@ export default function App() {
                     <span style={{ fontSize: 12, color: '#666', minWidth: 28 }}>{logoSize}%</span>
                   </div>
                 </div>
-
                 <div style={s.controlSection}>
                   <span style={{ ...s.sectionLabel, marginTop: 0 }}>Text overlay</span>
                   <input style={{ ...s.input, marginBottom: 8 }} type="text" placeholder="e.g. New Arrival, 20% Off, Spring Sale" value={overlayText} onChange={e => { setOverlayText(e.target.value); setTimeout(drawCanvas, 50); }} />
@@ -512,7 +442,6 @@ export default function App() {
                     <input type="color" value={overlayFg} style={{ width: 32, height: 28, padding: 2, border: '1px solid #e0e8d8', borderRadius: 6, cursor: 'pointer' }} onChange={e => { setOverlayFg(e.target.value); setTimeout(drawCanvas, 50); }} />
                   </div>
                 </div>
-
                 <div style={s.controlSection}>
                   <span style={{ ...s.sectionLabel, marginTop: 0 }}>Badge sticker</span>
                   <div style={s.badgeGrid}>
@@ -527,7 +456,6 @@ export default function App() {
                     ))}
                   </div>
                 </div>
-
                 <div style={s.controlSection}>
                   <span style={{ ...s.sectionLabel, marginTop: 0 }}>Name bar</span>
                   <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
