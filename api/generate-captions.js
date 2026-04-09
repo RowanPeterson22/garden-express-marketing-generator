@@ -46,13 +46,16 @@ Respond with ONLY a JSON object — no markdown, no explanation, no backticks:
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
+        model: 'claude-sonnet-4-6-20250514',
         max_tokens: 1000,
         messages: [{ role: 'user', content: prompt }],
       }),
     });
 
     const data = await response.json();
+
+    console.log('Anthropic response status:', response.status);
+    console.log('Anthropic response:', JSON.stringify(data).slice(0, 500));
 
     if (data.error) {
       return res.status(500).json({ error: data.error.message });
