@@ -193,9 +193,10 @@ export default function App() {
     if (logoChoice !== 'none') {
       const logoImg = logoChoice === 'full' ? GE_FLOWER_ICON : GE_FULL_LOGO;
       if (logoImg.complete && logoImg.naturalWidth > 0) {
+        const scale = W / canvasSize.w;
+        const lw = Math.round(logoImg.naturalWidth * scale);
+        const lh = Math.round(logoImg.naturalHeight * scale);
         const lPad = Math.round(W * 0.04);
-        const lw = logoImg.naturalWidth;
-        const lh = logoImg.naturalHeight;
         const lx = W - lw - lPad;
         const ly = H - lh - (canvasSize.h === 1920 ? Math.round(H * 0.08) : lPad);
         ctx.shadowColor = 'rgba(0,0,0,0.22)';
