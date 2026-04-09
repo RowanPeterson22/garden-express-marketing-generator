@@ -458,7 +458,7 @@ export default function App() {
         </div>
         <span style={{ fontSize: 16, fontWeight: 600, color: '#1a1a1a' }}>Garden Express</span>
         <span style={{ fontSize: 13, color: '#888', marginLeft: 4 }}>Social post creator</span>
-        <div style={{ marginLeft: 'auto', fontSize: 13, color: '#aaa', cursor: 'pointer' }} onClick={() => { setModule(null); setStep(1); setSelectedProduct(null); }}>← All tools</div>
+        <div style={{ marginLeft: 'auto', fontSize: 13, color: '#666', cursor: 'pointer', padding: '5px 12px', border: '1px solid #e0e8d8', borderRadius: 8, background: '#f7f9f5' }} onClick={() => { setModule(null); setStep(1); setSelectedProduct(null); }}>← All tools</div>
       </div>
       <div style={s.main}>
         <div style={s.stepBar}>
