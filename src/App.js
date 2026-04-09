@@ -230,13 +230,6 @@ export default function App() {
     { w: 1080, h: 1920, label: 'Story 9:16' },
   ];
 
-  const postTypes = [
-    { id: 'product', label: 'Product feature' },
-    { id: 'sale', label: 'Sale / promo' },
-    { id: 'new', label: 'New arrival' },
-    { id: 'seasonal', label: 'Seasonal' },
-  ];
-
   const filteredProducts = PRODUCTS.filter(p => {
     const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.cat.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCat = selectedCategory === 'All' || p.cat === selectedCategory;
