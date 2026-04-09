@@ -362,7 +362,45 @@ export default function App() {
             {selectedCaption && (
               <>
                 <span style={s.sectionLabel}>Edit caption</span>
-                <textarea style={s.textarea} value={editedCaption} onChange={e => setEditedCaption(e.target.value)} />
+                <textarea
+                  id="captionTextarea"
+                  style={s.textarea}
+                  value={editedCaption}
+                  onChange={e => setEditedCaption(e.target.value)}
+                />
+                <div style={{ marginTop: 8, border: '1px solid #e0e8d8', borderRadius: 10, padding: '10px 12px', background: '#f9fbf7' }}>
+                  <div style={{ fontSize: 12, color: '#888', marginBottom: 8, fontWeight: 500 }}>Tap an emoji to insert at cursor</div>
+                  {[
+                    { label: 'Plants', emojis: ['🌿','🌱','🍃','🌾','🌵','🎋','🎍','🪴','🌲','🌳','🌴'] },
+                    { label: 'Flowers', emojis: ['🌸','🌺','🌻','🌹','🌷','💐','🪷','🏵️'] },
+                    { label: 'Garden & Nature', emojis: ['🌍','☀️','🌤️','🌧️','💧','🌈','🍂','🍁','❄️','🌙'] },
+                    { label: 'Food & Edibles', emojis: ['🍓','🫐','🍋','🍅','🧄','🥕','🌽','🍎','🫒','🍇'] },
+                    { label: 'Lifestyle', emojis: ['🏡','✨','💚','💛','🤎','👩‍🌾','🧑‍🌾','🪻','🦋','🐝'] },
+                  ].map(group => (
+                    <div key={group.label} style={{ marginBottom: 8 }}>
+                      <div style={{ fontSize: 11, color: '#aaa', marginBottom: 4 }}>{group.label}</div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                        {group.emojis.map(emoji => (
+                          <button
+                            key={emoji}
+                            onClick={() => {
+                              const ta = document.getElementById('captionTextarea');
+                              if (!ta) { setEditedCaption(prev => prev + emoji); return; }
+                              const start = ta.selectionStart;
+                              const end = ta.selectionEnd;
+                              const newVal = editedCaption.slice(0, start) + emoji + editedCaption.slice(end);
+                              setEditedCaption(newVal);
+                              setTimeout(() => { ta.focus(); ta.setSelectionRange(start + emoji.length, start + emoji.length); }, 0);
+                            }}
+                            style={{ background: '#fff', border: '1px solid #e0e8d8', borderRadius: 6, padding: '4px 6px', fontSize: 18, cursor: 'pointer', lineHeight: 1 }}
+                          >
+                            {emoji}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
                 <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
                   <button style={s.btn('default')} onClick={() => setStep(1)}>Back</button>
                   <button style={s.btn('primary')} onClick={() => { if (!editedCaption.trim()) { alert('Please select or write a caption.'); return; } setStep(3); }}>Next: compose image →</button>

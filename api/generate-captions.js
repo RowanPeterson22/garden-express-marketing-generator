@@ -33,6 +33,7 @@ Rules:
 - Reflect Australian gardening seasons and lifestyle where relevant
 - Never use exclamation marks excessively — one per caption maximum
 - Never use the word "cheap"
+- Always use 2-3 emojis per caption, placed naturally inline within the text — not just at the start or end. Choose plant 🌿, garden 🌱, flower 🌸, weather ☀️, food 🍓, or lifestyle emojis that match the product. For elegant or premium products use more refined emojis (🌿🌸🍃) rather than playful ones.
 
 Respond with ONLY a JSON object — no markdown, no explanation, no backticks:
 {"captions":["caption one","caption two","caption three"]}`;
