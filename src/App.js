@@ -202,7 +202,7 @@ export default function App() {
         const lPad = Math.round(W * 0.04);
         const lw = logoImg.naturalWidth;
         const lh = logoImg.naturalHeight;
-        const lx = W - lw - lPad;
+        const lx = logoChoice === 'full' ? Math.round((W - lw) / 2) : W - lw - lPad;
         const ly = H - lh - (canvasSize.h === 1920 ? Math.round(H * 0.08) : lPad);
         ctx.shadowColor = 'rgba(0,0,0,0.22)';
         ctx.shadowBlur = 10;
@@ -283,7 +283,7 @@ export default function App() {
         const lPad = Math.round(canvasSize.w * 0.04);
         const lw = logoImg.naturalWidth;
         const lh = logoImg.naturalHeight;
-        const lx = canvasSize.w - lw - lPad;
+        const lx = logoChoice === 'full' ? Math.round((canvasSize.w - lw) / 2) : canvasSize.w - lw - lPad;
         const ly = canvasSize.h - lh - (canvasSize.h === 1920 ? Math.round(canvasSize.h * 0.08) : lPad);
         fctx.shadowColor = 'rgba(0,0,0,0.22)';
         fctx.shadowBlur = 10;
