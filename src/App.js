@@ -21,6 +21,9 @@ const PRODUCTS = [
   { id: 10, name: 'Blueberry Sunshine Blue', cat: 'Edibles', price: '$34.95', desc: 'Compact blueberry perfect for pots or small gardens. Self-fertile with masses of sweet berries.', emoji: '🫐' },
   { id: 11, name: 'Potting Mix Premium 30L', cat: 'Soils & Mulch', price: '$18.95', desc: 'Professional grade potting mix with controlled release fertiliser. Perfect for containers and raised beds.', emoji: '🪴' },
   { id: 12, name: 'Seasol Concentrate 1L', cat: 'Fertilisers', price: '$22.95', desc: "Australia's favourite garden tonic. Improves soil health and plant resilience naturally.", emoji: '🌱' },
+  { id: 13, name: 'Camellia Jury\'s Yellow', cat: 'Specials', price: '$19.95', wasPrice: '$34.95', desc: 'Stunning semi-double yellow camellia flowers in winter. A rare and beautiful variety now on special.', emoji: '🌼' },
+  { id: 14, name: 'Agapanthus Blue Storm', cat: 'Specials', price: '$12.95', wasPrice: '$22.95', desc: 'Deep blue agapanthus with tall flower stems. Perfect for borders and mass planting. Limited stock.', emoji: '💙' },
+  { id: 15, name: 'Wisteria Blue Moon', cat: 'Specials', price: '$19.95', wasPrice: '$39.95', desc: 'Spectacular fragrant blue-purple flowers. One of the most cold-hardy wisterias available. Clearance price.', emoji: '🪻' },
 ];
 
 const CATEGORIES = ['All', ...new Set(PRODUCTS.map(p => p.cat))];
@@ -285,7 +288,7 @@ export default function App() {
       const res = await fetch('/api/generate-captions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ product: selectedProduct.name, price: selectedProduct.price, description: selectedProduct.desc, postType }),
+        body: JSON.stringify({ product: selectedProduct.name, price: selectedProduct.price, wasPrice: selectedProduct.wasPrice || null, description: selectedProduct.desc, postType }),
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
@@ -479,9 +482,16 @@ export default function App() {
               {filteredProducts.map(p => (
                 <div key={p.id} style={s.productCard(selectedProduct?.id === p.id)} onClick={() => { setSelectedProduct(p); setStep(2); }}>
                   <div style={s.pImg}>{p.emoji}</div>
-                  <div style={{ fontSize: 11, color: '#aaa', marginBottom: 3 }}>{p.cat}</div>
+                  <div style={{ fontSize: 11, color: p.cat === 'Specials' ? BRAND.pink : '#aaa', marginBottom: 3, fontWeight: p.cat === 'Specials' ? 500 : 400 }}>{p.cat}</div>
                   <div style={{ fontSize: 13, fontWeight: 500, marginBottom: 3, lineHeight: 1.3 }}>{p.name}</div>
-                  <div style={{ fontSize: 12, color: '#666' }}>{p.price}</div>
+                  {p.wasPrice ? (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                      <span style={{ fontSize: 12, color: '#bbb', textDecoration: 'line-through' }}>{p.wasPrice}</span>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: BRAND.pink }}>{p.price}</span>
+                    </div>
+                  ) : (
+                    <div style={{ fontSize: 12, color: '#666' }}>{p.price}</div>
+                  )}
                 </div>
               ))}
             </div>
@@ -494,7 +504,14 @@ export default function App() {
             <div style={s.selBar}>
               <strong>{selectedProduct?.name}</strong>
               <span style={s.tag('green')}>{selectedProduct?.cat}</span>
-              <span style={s.tag('pink')}>{selectedProduct?.price}</span>
+              {selectedProduct?.wasPrice ? (
+                <>
+                  <span style={{ fontSize: 11, color: '#bbb', textDecoration: 'line-through' }}>{selectedProduct.wasPrice}</span>
+                  <span style={s.tag('pink')}>{selectedProduct?.price}</span>
+                </>
+              ) : (
+                <span style={s.tag('pink')}>{selectedProduct?.price}</span>
+              )}
             </div>
             <span style={{ ...s.sectionLabel, marginTop: 0 }}>Post type</span>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>

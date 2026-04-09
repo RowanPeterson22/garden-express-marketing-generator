@@ -3,7 +3,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { product, price, description, postType } = req.body;
+  const { product, price, wasPrice, description, postType } = req.body;
 
   if (!product) {
     return res.status(400).json({ error: 'Product is required' });
@@ -23,7 +23,7 @@ Brand tone of voice: Warm, knowledgeable and passionate about plants and gardeni
 Task: ${typePrompts[postType] || typePrompts.product}
 
 Product: ${product}
-Price: ${price || ''}
+Price: ${price || ''}${wasPrice ? `\nWas: ${wasPrice} (this is a special/sale price — mention the saving)` : ''}
 Description: ${description || ''}
 
 Rules:
