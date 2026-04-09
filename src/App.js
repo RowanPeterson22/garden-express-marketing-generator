@@ -88,6 +88,7 @@ function PasswordScreen({ onUnlock }) {
 
 export default function App() {
   const [authed, setAuthed] = useState(() => sessionStorage.getItem('ge_auth') === 'true');
+  const [module, setModule] = useState(null);
   const [step, setStep] = useState(1);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -229,8 +230,6 @@ export default function App() {
     { w: 1080, h: 1350, label: 'Portrait 4:5' },
     { w: 1080, h: 1920, label: 'Story 9:16' },
   ];
-
-  const [module, setModule] = useState(null);
 
   const filteredProducts = PRODUCTS.filter(p => {
     const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.cat.toLowerCase().includes(searchQuery.toLowerCase());
