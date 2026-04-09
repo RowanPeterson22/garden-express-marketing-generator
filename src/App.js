@@ -191,18 +191,13 @@ export default function App() {
     }
 
     if (logoChoice !== 'none') {
-      const logoImg = logoChoice === 'full' ? GE_FULL_LOGO : GE_FLOWER_ICON;
+      const logoImg = logoChoice === 'full' ? GE_FLOWER_ICON : GE_FULL_LOGO;
       if (logoImg.complete && logoImg.naturalWidth > 0) {
         const lPad = Math.round(W * 0.04);
-        let lw, lh, lx, ly;
-        if (logoChoice === 'full') {
-          lw = Math.round(W * (canvasSize.w === 1080 && canvasSize.h === 1080 ? 0.38 : canvasSize.h === 1920 ? 0.42 : 0.40));
-        } else {
-          lw = Math.round(W * (canvasSize.w === 1080 && canvasSize.h === 1080 ? 0.18 : canvasSize.h === 1920 ? 0.18 : 0.16));
-        }
-        lh = Math.round(lw * (logoImg.height / logoImg.width));
-        lx = W - lw - lPad;
-        ly = H - lh - (canvasSize.h === 1920 ? Math.round(H * 0.08) : lPad);
+        const lw = logoImg.naturalWidth;
+        const lh = logoImg.naturalHeight;
+        const lx = W - lw - lPad;
+        const ly = H - lh - (canvasSize.h === 1920 ? Math.round(H * 0.08) : lPad);
         ctx.shadowColor = 'rgba(0,0,0,0.22)';
         ctx.shadowBlur = 10;
         ctx.shadowOffsetX = 2;
