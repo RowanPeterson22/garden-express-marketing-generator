@@ -99,7 +99,7 @@ export default function App() {
   const [generating, setGenerating] = useState(false);
   const [genError, setGenError] = useState('');
   const [canvasSize, setCanvasSize] = useState({ w: 1080, h: 1080, label: 'Feed 1:1' });
-  const [barStyle, setBarStyle] = useState('bottom');
+  const [barStyle, setBarStyle] = useState('none');
   const [overlayText, setOverlayText] = useState('');
   const [overlayStyle, setOverlayStyle] = useState('banner');
   const [overlayPos, setOverlayPos] = useState('top');
@@ -566,7 +566,12 @@ export default function App() {
                   <span style={{ ...s.sectionLabel, marginTop: 0 }}>Product image</span>
                   <label style={s.uploadLabel} htmlFor="productImg">Upload product photo</label>
                   <input type="file" id="productImg" accept="image/*" style={{ display: 'none' }} onChange={e => handleFileUpload(e, img => { setProductImg(img); drawCanvas(); })} />
-                  {productImg && <div style={{ fontSize: 12, color: BRAND.green, marginTop: 6 }}>Image loaded ✓</div>}
+                  {productImg && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6 }}>
+                      <div style={{ fontSize: 12, color: BRAND.green }}>Image loaded ✓</div>
+                      <button onClick={() => { setProductImg(null); drawCanvas(); }} style={{ fontSize: 11, padding: '2px 8px', border: '1px solid #e05555', borderRadius: 6, background: '#fff', color: '#e05555', cursor: 'pointer', fontFamily: BRAND.font }}>Remove</button>
+                    </div>
+                  )}
                 </div>
                 <div style={s.controlSection}>
                   <span style={{ ...s.sectionLabel, marginTop: 0 }}>Garden Express logo</span>
