@@ -110,8 +110,12 @@ export default function App() {
   const [logoChoice, setLogoChoice] = useState('none');
   const [productImg, setProductImg] = useState(null);
   const canvasRef = useRef(null);
+  const stateRef = useRef({});
+
+  stateRef.current = { canvasSize, barStyle, overlayText, overlayStyle, overlayPos, overlayBg, overlayFg, selectedBadge, badgeColor, logoChoice, productImg, selectedProduct };
 
   const drawCanvas = useCallback(() => {
+    const { canvasSize, barStyle, overlayText, overlayStyle, overlayPos, overlayBg, overlayFg, selectedBadge, badgeColor, logoChoice, productImg, selectedProduct } = stateRef.current;
     if (!canvasRef.current || !selectedProduct) return;
     const cv = canvasRef.current;
     const scale = Math.min(480 / canvasSize.w, 480 / canvasSize.h);
@@ -196,6 +200,7 @@ export default function App() {
       bWords.forEach((w, i) => ctx.fillText(w, bx, by + (i - (bWords.length - 1) / 2) * (bFs * 1.1)));
     }
 
+    // Draw logo on preview only
     if (logoChoice !== 'none') {
       const logoImg = logoChoice === 'full' ? GE_FULL_LOGO_PREVIEW : GE_FLOWER_ICON_PREVIEW;
       if (logoImg.complete && logoImg.naturalWidth > 0) {
@@ -210,7 +215,7 @@ export default function App() {
         ctx.restore();
       }
     }
-  }, [selectedProduct, canvasSize, barStyle, overlayText, overlayStyle, overlayPos, overlayBg, overlayFg, selectedBadge, badgeColor, logoChoice, productImg]);
+  }, []);
 
   useEffect(() => { if (step === 3) drawCanvas(); }, [step, drawCanvas]);
 
@@ -266,26 +271,106 @@ export default function App() {
   };
 
   const downloadImage = () => {
+    const { canvasSize, barStyle, overlayText, overlayStyle, overlayPos, overlayBg, overlayFg, selectedBadge, badgeColor, logoChoice, productImg, selectedProduct } = stateRef.current;
     if (!canvasRef.current || !selectedProduct) return;
-    const cv = canvasRef.current;
+    const W = canvasSize.w, H = canvasSize.h;
     const full = document.createElement('canvas');
-    full.width = canvasSize.w; full.height = canvasSize.h;
+    full.width = W; full.height = H;
     const fctx = full.getContext('2d');
-    fctx.drawImage(cv, 0, 0, canvasSize.w, canvasSize.h);
+
+    // Draw background / product image at full res
+    if (productImg) {
+      const s = Math.max(W / productImg.width, H / productImg.height);
+      fctx.drawImage(productImg, (W - productImg.width * s) / 2, (H - productImg.height * s) / 2, productImg.width * s, productImg.height * s);
+    } else {
+      fctx.fillStyle = '#e8f5d4';
+      fctx.fillRect(0, 0, W, H);
+      fctx.font = `${Math.round(Math.min(W, H) * 0.55)}px sans-serif`;
+      fctx.textAlign = 'center';
+      fctx.textBaseline = 'middle';
+      fctx.fillText(selectedProduct.emoji, W / 2, H * 0.44);
+    }
+
+    // Redraw name bar
+    const bH = Math.round(H * 0.2), pad = Math.round(W * 0.05);
+    if (barStyle === 'bottom' || barStyle === 'top') {
+      const y = barStyle === 'bottom' ? H - bH : 0;
+      fctx.fillStyle = 'rgba(30,70,10,0.9)'; fctx.fillRect(0, y, W, bH);
+      fctx.textAlign = 'left'; fctx.textBaseline = 'top';
+      fctx.font = `500 ${Math.round(W * 0.052)}px Inter, sans-serif`; fctx.fillStyle = '#fff';
+      fctx.fillText(selectedProduct.name, pad, y + Math.round(bH * 0.1), W - pad * 2);
+      fctx.font = `${Math.round(W * 0.042)}px Inter, sans-serif`; fctx.fillStyle = '#b8e87a';
+      fctx.fillText(selectedProduct.price, pad, y + Math.round(bH * 0.45));
+      fctx.font = `${Math.round(W * 0.028)}px Inter, sans-serif`; fctx.fillStyle = 'rgba(255,255,255,0.55)';
+      fctx.fillText('Garden Express', pad, y + Math.round(bH * 0.72));
+    } else if (barStyle === 'minimal') {
+      const sH = Math.round(bH * 0.6);
+      fctx.fillStyle = 'rgba(0,0,0,0.4)'; fctx.fillRect(0, H - sH, W, sH);
+      fctx.textAlign = 'left'; fctx.textBaseline = 'top';
+      fctx.font = `500 ${Math.round(W * 0.05)}px Inter, sans-serif`; fctx.fillStyle = '#fff';
+      fctx.fillText(selectedProduct.name, pad, H - sH + Math.round(sH * 0.1), W - pad * 2);
+      fctx.font = `${Math.round(W * 0.028)}px Inter, sans-serif`; fctx.fillStyle = 'rgba(255,255,255,0.65)';
+      fctx.fillText('Garden Express · ' + selectedProduct.price, pad, H - sH + Math.round(sH * 0.55));
+    }
+
+    // Redraw text overlay
+    if (overlayText.trim()) {
+      const oFs = Math.round(W * 0.046);
+      fctx.font = `500 ${oFs}px Inter, sans-serif`;
+      const tw = fctx.measureText(overlayText).width;
+      const oPad = Math.round(W * 0.04);
+      let oy = overlayPos === 'top' ? Math.round(H * 0.06) : overlayPos === 'mid' ? Math.round(H * 0.5) - Math.round(oFs * 0.5) : Math.round(H * 0.82);
+      if (overlayStyle === 'banner') {
+        fctx.fillStyle = overlayBg; fctx.fillRect(0, oy - oPad, W, oFs + oPad * 2);
+        fctx.fillStyle = overlayFg; fctx.textAlign = 'center'; fctx.textBaseline = 'top';
+        fctx.fillText(overlayText, W / 2, oy);
+      } else if (overlayStyle === 'pill') {
+        const ox = W / 2 - (tw / 2 + oPad * 1.2);
+        fctx.fillStyle = overlayBg; fctx.beginPath(); fctx.roundRect(ox, oy - oPad * 0.8, tw + oPad * 2.4, oFs + oPad * 1.6, oFs); fctx.fill();
+        fctx.fillStyle = overlayFg; fctx.textAlign = 'center'; fctx.textBaseline = 'top';
+        fctx.fillText(overlayText, W / 2, oy);
+      } else {
+        const r = Math.round(Math.min(W, H) * 0.12);
+        const ox = W - r - Math.round(W * 0.06);
+        const burstY = overlayPos === 'top' ? r + Math.round(H * 0.06) : H - r - Math.round(H * 0.06);
+        fctx.fillStyle = overlayBg; fctx.beginPath();
+        for (let i = 0; i < 16; i++) { const a = (i / 16) * Math.PI * 2 - Math.PI / 2; const ri = i % 2 === 0 ? r : r * 0.75; i === 0 ? fctx.moveTo(ox + Math.cos(a) * ri, burstY + Math.sin(a) * ri) : fctx.lineTo(ox + Math.cos(a) * ri, burstY + Math.sin(a) * ri); }
+        fctx.closePath(); fctx.fill();
+        fctx.fillStyle = overlayFg; fctx.textAlign = 'center'; fctx.textBaseline = 'middle';
+        fctx.font = `500 ${Math.round(oFs * 0.72)}px Inter, sans-serif`;
+        overlayText.split(' ').forEach((w, i, arr) => fctx.fillText(w, ox, burstY + (i - (arr.length - 1) / 2) * (oFs * 0.9)));
+      }
+    }
+
+    // Redraw badge
+    if (selectedBadge) {
+      const bc = BADGE_COLORS[badgeColor] || BADGE_COLORS.green;
+      const br = Math.round(Math.min(W, H) * 0.11);
+      const bx = W - br - Math.round(W * 0.04), by = br + Math.round(H * 0.04);
+      fctx.fillStyle = bc; fctx.beginPath();
+      for (let i = 0; i < 16; i++) { const a = (i / 16) * Math.PI * 2 - Math.PI / 2; const ri = i % 2 === 0 ? br : br * 0.78; i === 0 ? fctx.moveTo(bx + Math.cos(a) * ri, by + Math.sin(a) * ri) : fctx.lineTo(bx + Math.cos(a) * ri, by + Math.sin(a) * ri); }
+      fctx.closePath(); fctx.fill();
+      fctx.fillStyle = '#fff'; fctx.textAlign = 'center'; fctx.textBaseline = 'middle';
+      const bWords = selectedBadge.toUpperCase().split(' '), bFs = Math.round(br * 0.36);
+      fctx.font = `500 ${bFs}px Inter, sans-serif`;
+      bWords.forEach((w, i) => fctx.fillText(w, bx, by + (i - (bWords.length - 1) / 2) * (bFs * 1.1)));
+    }
+
+    // Draw full-res logo last
     if (logoChoice !== 'none') {
       const logoImg = logoChoice === 'full' ? GE_FULL_LOGO_OUTPUT : GE_FLOWER_ICON_OUTPUT;
       if (logoImg.complete && logoImg.naturalWidth > 0) {
-        const lPad = Math.round(canvasSize.w * 0.04);
-        const lw = logoImg.naturalWidth;
-        const lh = logoImg.naturalHeight;
-        const lx = logoChoice === 'full' ? Math.round((canvasSize.w - lw) / 2) : canvasSize.w - lw - lPad;
-        const ly = canvasSize.h - lh - (canvasSize.h === 1920 ? Math.round(canvasSize.h * 0.08) : lPad);
+        const lPad = Math.round(W * 0.04);
+        const lw = logoImg.naturalWidth, lh = logoImg.naturalHeight;
+        const lx = logoChoice === 'full' ? Math.round((W - lw) / 2) : W - lw - lPad;
+        const ly = H - lh - (H === 1920 ? Math.round(H * 0.08) : lPad);
         fctx.save();
         fctx.filter = 'drop-shadow(2px 3px 4px rgba(0,0,0,0.3))';
         fctx.drawImage(logoImg, lx, ly, lw, lh);
         fctx.restore();
       }
     }
+
     const dataUrl = full.toDataURL('image/png');
     try {
       const arr = dataUrl.split(','), mime = arr[0].match(/:(.*?);/)[1], b = atob(arr[1]);
@@ -473,20 +558,20 @@ export default function App() {
                 <div style={s.controlSection}>
                   <span style={{ ...s.sectionLabel, marginTop: 0 }}>Canvas size</span>
                   <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                    {sizes.map(sz => <div key={sz.label} style={s.pill(canvasSize.label === sz.label)} onClick={() => { setCanvasSize(sz); setTimeout(drawCanvas, 50); }}>{sz.label}</div>)}
+                    {sizes.map(sz => <div key={sz.label} style={s.pill(canvasSize.label === sz.label)} onClick={() => { setCanvasSize(sz); drawCanvas(); }}>{sz.label}</div>)}
                   </div>
                 </div>
                 <div style={s.controlSection}>
                   <span style={{ ...s.sectionLabel, marginTop: 0 }}>Product image</span>
                   <label style={s.uploadLabel} htmlFor="productImg">Upload product photo</label>
-                  <input type="file" id="productImg" accept="image/*" style={{ display: 'none' }} onChange={e => handleFileUpload(e, img => { setProductImg(img); setTimeout(drawCanvas, 50); })} />
+                  <input type="file" id="productImg" accept="image/*" style={{ display: 'none' }} onChange={e => handleFileUpload(e, img => { setProductImg(img); drawCanvas(); })} />
                   {productImg && <div style={{ fontSize: 12, color: BRAND.green, marginTop: 6 }}>Image loaded ✓</div>}
                 </div>
                 <div style={s.controlSection}>
                   <span style={{ ...s.sectionLabel, marginTop: 0 }}>Garden Express logo</span>
                   <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                     {[['none', 'None'], ['full', 'Full logo'], ['flower', 'Flower icon']].map(([val, label]) => (
-                      <div key={val} style={s.pill(logoChoice === val)} onClick={() => { setLogoChoice(val); setTimeout(drawCanvas, 50); }}>{label}</div>
+                      <div key={val} style={s.pill(logoChoice === val)} onClick={() => { setLogoChoice(val); drawCanvas(); }}>{label}</div>
                     ))}
                   </div>
                   <div style={{ fontSize: 12, color: '#aaa', marginTop: 8, lineHeight: 1.5 }}>
@@ -495,37 +580,37 @@ export default function App() {
                 </div>
                 <div style={s.controlSection}>
                   <span style={{ ...s.sectionLabel, marginTop: 0 }}>Text overlay</span>
-                  <input style={{ ...s.input, marginBottom: 8 }} type="text" placeholder="e.g. New Arrival, 20% Off, Spring Sale" value={overlayText} onChange={e => { setOverlayText(e.target.value); setTimeout(drawCanvas, 50); }} />
+                  <input style={{ ...s.input, marginBottom: 8 }} type="text" placeholder="e.g. New Arrival, 20% Off, Spring Sale" value={overlayText} onChange={e => { setOverlayText(e.target.value); drawCanvas(); }} />
                   <div style={s.row2}>
                     <span style={{ fontSize: 12, color: '#666' }}>Style</span>
                     {[['banner', 'Banner'], ['pill', 'Pill'], ['burst', 'Burst']].map(([style, label]) => (
-                      <div key={style} style={{ ...s.pill(overlayStyle === style), padding: '4px 8px', fontSize: 11 }} onClick={() => { setOverlayStyle(style); setTimeout(drawCanvas, 50); }}>{label}</div>
+                      <div key={style} style={{ ...s.pill(overlayStyle === style), padding: '4px 8px', fontSize: 11 }} onClick={() => { setOverlayStyle(style); drawCanvas(); }}>{label}</div>
                     ))}
                   </div>
                   <div style={s.row2}>
                     <span style={{ fontSize: 12, color: '#666' }}>Position</span>
                     {[['top', 'Top'], ['mid', 'Middle'], ['bot', 'Bottom']].map(([pos, label]) => (
-                      <div key={pos} style={{ ...s.pill(overlayPos === pos), padding: '4px 8px', fontSize: 11 }} onClick={() => { setOverlayPos(pos); setTimeout(drawCanvas, 50); }}>{label}</div>
+                      <div key={pos} style={{ ...s.pill(overlayPos === pos), padding: '4px 8px', fontSize: 11 }} onClick={() => { setOverlayPos(pos); drawCanvas(); }}>{label}</div>
                     ))}
                   </div>
                   <div style={{ ...s.row2, marginTop: 8 }}>
                     <span style={{ fontSize: 12, color: '#666' }}>Bg</span>
-                    <input type="color" value={overlayBg} style={{ width: 32, height: 28, padding: 2, border: '1px solid #e0e8d8', borderRadius: 6, cursor: 'pointer' }} onChange={e => { setOverlayBg(e.target.value); setTimeout(drawCanvas, 50); }} />
+                    <input type="color" value={overlayBg} style={{ width: 32, height: 28, padding: 2, border: '1px solid #e0e8d8', borderRadius: 6, cursor: 'pointer' }} onChange={e => { setOverlayBg(e.target.value); drawCanvas(); }} />
                     <span style={{ fontSize: 12, color: '#666' }}>Text</span>
-                    <input type="color" value={overlayFg} style={{ width: 32, height: 28, padding: 2, border: '1px solid #e0e8d8', borderRadius: 6, cursor: 'pointer' }} onChange={e => { setOverlayFg(e.target.value); setTimeout(drawCanvas, 50); }} />
+                    <input type="color" value={overlayFg} style={{ width: 32, height: 28, padding: 2, border: '1px solid #e0e8d8', borderRadius: 6, cursor: 'pointer' }} onChange={e => { setOverlayFg(e.target.value); drawCanvas(); }} />
                   </div>
                 </div>
                 <div style={s.controlSection}>
                   <span style={{ ...s.sectionLabel, marginTop: 0 }}>Badge sticker</span>
                   <div style={s.badgeGrid}>
                     {[['', 'None'], ['new', 'NEW'], ['sale', 'SALE'], ['hot', 'HOT'], ['limited', 'LIMITED'], ['back', 'BACK IN STOCK']].map(([val, label]) => (
-                      <div key={val} style={s.badgeOpt(selectedBadge === val)} onClick={() => { setSelectedBadge(val); setTimeout(drawCanvas, 50); }}>{label}</div>
+                      <div key={val} style={s.badgeOpt(selectedBadge === val)} onClick={() => { setSelectedBadge(val); drawCanvas(); }}>{label}</div>
                     ))}
                   </div>
                   <div style={s.row2}>
                     <span style={{ fontSize: 12, color: '#666' }}>Colour</span>
                     {[['green', 'Green', BRAND.green], ['pink', 'Pink', BRAND.pink], ['amber', 'Amber', '#d68910'], ['navy', 'Navy', '#1a3a5c']].map(([col, label, hex]) => (
-                      <div key={col} style={{ ...s.pill(badgeColor === col), padding: '4px 8px', fontSize: 11, background: badgeColor === col ? hex : '#fff', borderColor: badgeColor === col ? hex : '#e0e8d8' }} onClick={() => { setBadgeColor(col); setTimeout(drawCanvas, 50); }}>{label}</div>
+                      <div key={col} style={{ ...s.pill(badgeColor === col), padding: '4px 8px', fontSize: 11, background: badgeColor === col ? hex : '#fff', borderColor: badgeColor === col ? hex : '#e0e8d8' }} onClick={() => { setBadgeColor(col); drawCanvas(); }}>{label}</div>
                     ))}
                   </div>
                 </div>
@@ -533,7 +618,7 @@ export default function App() {
                   <span style={{ ...s.sectionLabel, marginTop: 0 }}>Name bar</span>
                   <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                     {[['bottom', 'Bottom'], ['top', 'Top'], ['minimal', 'Minimal'], ['none', 'None']].map(([style, label]) => (
-                      <div key={style} style={s.pill(barStyle === style)} onClick={() => { setBarStyle(style); setTimeout(drawCanvas, 50); }}>{label}</div>
+                      <div key={style} style={s.pill(barStyle === style)} onClick={() => { setBarStyle(style); drawCanvas(); }}>{label}</div>
                     ))}
                   </div>
                 </div>
