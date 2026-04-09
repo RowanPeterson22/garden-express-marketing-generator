@@ -468,7 +468,7 @@ export default function App() {
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
               {postTypes.map(pt => <div key={pt.id} style={s.pill(postType === pt.id)} onClick={() => setPostType(pt.id)}>{pt.label}</div>)}
             </div>
-            <div style={s.infoBox}>Click <strong>Generate captions</strong> — Claude will write 3 options using the Garden Express tone of voice.</div>
+            <div style={s.infoBox}>Click <strong>Generate captions</strong> — we'll write 3 options using the Garden Express tone of voice.</div>
             <div style={{ display: 'flex', gap: 8, marginBottom: 16, alignItems: 'center' }}>
               <button style={s.btn('primary')} onClick={generateCaptions} disabled={generating}>
                 {generating ? 'Generating...' : captions.length ? 'Regenerate' : 'Generate captions'}
