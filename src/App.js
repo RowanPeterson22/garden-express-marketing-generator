@@ -209,7 +209,7 @@ export default function App() {
         const lh = Math.round(logoImg.naturalHeight * logoScale);
         const lPad = Math.round(W * 0.04);
         const is45 = canvasSize.w === 1080 && canvasSize.h === 1350;
-        const flowerPad = logoChoice === 'flower' && is45 ? Math.round(175 * logoScale) : lPad;
+        const flowerPad = logoChoice === 'flower' && is45 ? Math.round(175 * (W / canvasSize.w)) : lPad;
         const lx = logoChoice === 'full' ? Math.round((W - lw) / 2) : W - lw - flowerPad;
         const ly = H - lh - (canvasSize.h === 1920 ? Math.round(H * 0.08) : lPad);
         ctx.save();
