@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import ReactCrop from 'react-image-crop';
+import 'react-image-crop/dist/ReactCrop.css';
 
 const BRAND = {
   green: '#70b738',
@@ -113,6 +115,10 @@ export default function App() {
   const [badgeColor, setBadgeColor] = useState('green');
   const [logoChoice, setLogoChoice] = useState('none');
   const [productImg, setProductImg] = useState(null);
+  const [cropSrc, setCropSrc] = useState(null);
+  const [crop, setCrop] = useState({ unit: '%', width: 80, height: 80, x: 10, y: 10 });
+  const [completedCrop, setCompletedCrop] = useState(null);
+  const cropImgRef = useRef(null);
   const canvasRef = useRef(null);
   const stateRef = useRef({});
 
@@ -299,6 +305,21 @@ export default function App() {
     setGenerating(false);
   };
 
+
+  const confirmCrop = () => {
+    if (!completedCrop || !cropImgRef.current) return;
+    const image = cropImgRef.current;
+    const canvas = document.createElement('canvas');
+    const scaleX = image.naturalWidth / image.width;
+    const scaleY = image.naturalHeight / image.height;
+    canvas.width = completedCrop.width * scaleX;
+    canvas.height = completedCrop.height * scaleY;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(image, completedCrop.x * scaleX, completedCrop.y * scaleY, completedCrop.width * scaleX, completedCrop.height * scaleY, 0, 0, canvas.width, canvas.height);
+    const croppedImg = new Image();
+    croppedImg.onload = () => { setProductImg(croppedImg); setCropSrc(null); };
+    croppedImg.src = canvas.toDataURL('image/png');
+  };
 
   const handleFileUpload = (e, setter) => {
     const file = e.target.files[0]; if (!file) return;
@@ -634,7 +655,13 @@ export default function App() {
                 <div style={s.controlSection}>
                   <span style={{ ...s.sectionLabel, marginTop: 0 }}>Product image</span>
                   <label style={s.uploadLabel} htmlFor="productImg">Upload product photo</label>
-                  <input type="file" id="productImg" accept="image/*" style={{ display: 'none' }} onChange={e => handleFileUpload(e, img => { setProductImg(img); })} />
+                  <input type="file" id="productImg" accept="image/*" style={{ display: 'none' }} onChange={e => {
+                    const file = e.target.files[0]; if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = ev => { setCropSrc(ev.target.result); setCrop({ unit: '%', width: 80, height: 80, x: 10, y: 10 }); setCompletedCrop(null); };
+                    reader.readAsDataURL(file);
+                    e.target.value = '';
+                  }} />
                   {productImg && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6 }}>
                       <div style={{ fontSize: 12, color: BRAND.green }}>Image loaded ✓</div>
@@ -702,6 +729,21 @@ export default function App() {
           </div>
         )}
       </div>
+      {cropSrc && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 24 }}>
+          <div style={{ background: '#fff', borderRadius: 16, padding: 24, maxWidth: 600, width: '100%', maxHeight: '90vh', overflowY: 'auto' }}>
+            <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 4, color: '#1a1a1a' }}>Crop image</div>
+            <div style={{ fontSize: 13, color: '#888', marginBottom: 16 }}>Drag to select the area you want to use</div>
+            <ReactCrop crop={crop} onChange={c => setCrop(c)} onComplete={c => setCompletedCrop(c)}>
+              <img ref={cropImgRef} src={cropSrc} alt="crop preview" style={{ maxWidth: '100%', maxHeight: '60vh' }} />
+            </ReactCrop>
+            <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
+              <button onClick={() => setCropSrc(null)} style={{ padding: '9px 18px', border: '1px solid #ccc', borderRadius: 8, background: '#fff', fontSize: 14, cursor: 'pointer', fontFamily: BRAND.font }}>Cancel</button>
+              <button onClick={confirmCrop} style={{ padding: '9px 18px', border: `1px solid ${BRAND.green}`, borderRadius: 8, background: BRAND.green, color: '#fff', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: BRAND.font }}>Use this crop</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
