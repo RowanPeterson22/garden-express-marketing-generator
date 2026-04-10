@@ -331,6 +331,27 @@ export default function App() {
     croppedImg.src = canvas.toDataURL('image/png');
   };
 
+  const openEmojiCrop = () => {
+    const size = 600;
+    const c = document.createElement('canvas');
+    c.width = size; c.height = size;
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = '#e8f5d4';
+    ctx.fillRect(0, 0, size, size);
+    ctx.font = `${Math.round(size * 0.55)}px sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(selectedProduct?.emoji || '🌿', size / 2, size / 2);
+    const src = c.toDataURL('image/png');
+    setRawImgSrc(src);
+    setCroppedImgs({ '1:1': null, '4:5': null, '9:16': null });
+    const aspectMap = { '1:1': 1, '4:5': 4/5, '9:16': 9/16 };
+    setCropFormat(formatKey);
+    setCropSrc(src);
+    setCrop({ unit: '%', width: 80, height: 80 * aspectMap[formatKey], x: 10, y: 10 });
+    setCompletedCrop(null);
+  };
+
   const openCrop = (format) => {
     if (!rawImgSrc) return;
     const aspectMap = { '1:1': 1, '4:5': 4/5, '9:16': 9/16 };
@@ -687,6 +708,11 @@ export default function App() {
                     reader.readAsDataURL(file);
                     e.target.value = '';
                   }} />
+                  {!rawImgSrc && (
+                    <button onClick={openEmojiCrop} style={{ marginTop: 8, width: '100%', padding: '7px 14px', border: `1px dashed ${BRAND.green}`, borderRadius: 8, fontSize: 13, cursor: 'pointer', color: BRAND.green, background: '#f7fbf0', fontFamily: BRAND.font, textAlign: 'center' }}>
+                      Crop emoji placeholder instead
+                    </button>
+                  )}
                   {rawImgSrc && (
                     <div style={{ marginTop: 8 }}>
                       <div style={{ fontSize: 12, color: '#666', marginBottom: 6 }}>Crop per format:</div>
