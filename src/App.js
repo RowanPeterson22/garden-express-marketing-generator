@@ -321,12 +321,6 @@ export default function App() {
     croppedImg.src = canvas.toDataURL('image/png');
   };
 
-  const handleFileUpload = (e, setter) => {
-    const file = e.target.files[0]; if (!file) return;
-    const reader = new FileReader();
-    reader.onload = ev => { const img = new Image(); img.onload = () => { setter(img); }; img.src = ev.target.result; };
-    reader.readAsDataURL(file);
-  };
 
   const downloadImage = () => {
     const { canvasSize, barStyle, overlayText, overlayStyle, overlayPos, overlayBg, overlayFg, selectedBadge, badgeColor, logoChoice, productImg, selectedProduct } = stateRef.current;
