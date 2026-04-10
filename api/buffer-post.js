@@ -5,8 +5,8 @@ export default async function handler(req, res) {
 
   const { caption, imageDataUrl, channelIds } = req.body;
 
-  if (!caption || !channelIds || channelIds.length === 0) {
-    return res.status(400).json({ error: 'Caption and at least one channel are required' });
+  if (!channelIds || channelIds.length === 0) {
+    return res.status(400).json({ error: 'At least one channel is required' });
   }
 
   const apiKey = process.env.BUFFER_API_KEY;
@@ -14,56 +14,111 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Buffer API key not configured' });
   }
 
-  try {
-    // If we have an image, upload it to Buffer first
-    let mediaIds = [];
-    if (imageDataUrl) {
-      // Convert base64 data URL to buffer
-      const base64Data = imageDataUrl.replace(/^data:image\/\w+;base64,/, '');
-      const imageBuffer = Buffer.from(base64Data, 'base64');
+  const results = [];
 
-      // Upload image to Buffer media endpoint
-      const uploadRes = await fetch('https://api.bufferapp.com/1/media/upload.json', {
+  for (const channelId of channelIds) {
+    try {
+      // Build assets array if image provided
+      let assetsBlock = '';
+      if (imageDataUrl) {
+        const base64Data = imageDataUrl.replace(/^data:image\/\w+;base64,/, '');
+        // Upload image first
+        const uploadQuery = `
+          mutation UploadMedia($input: UploadMediaInput!) {
+            uploadMedia(input: $input) {
+              ... on UploadMediaSuccess {
+                mediaId
+              }
+              ... on MutationError {
+                message
+              }
+            }
+          }
+        `;
+
+        const uploadRes = await fetch('https://api.buffer.com', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`,
+          },
+          body: JSON.stringify({
+            query: uploadQuery,
+            variables: {
+              input: {
+                base64: base64Data,
+                mimeType: 'image/png',
+                fileName: 'garden-express-post.png',
+              }
+            }
+          }),
+        });
+
+        const uploadData = await uploadRes.json();
+        const mediaId = uploadData.data?.uploadMedia?.mediaId;
+        if (mediaId) {
+          assetsBlock = `mediaFileIds: ["${mediaId}"]`;
+        }
+      }
+
+      // Create the post
+      const mutation = `
+        mutation CreatePost {
+          createPost(input: {
+            text: ${JSON.stringify(caption || '')},
+            channelId: "${channelId}",
+            schedulingType: automatic,
+            mode: addToQueue
+            ${assetsBlock ? `, ${assetsBlock}` : ''}
+          }) {
+            ... on PostActionSuccess {
+              post {
+                id
+                text
+                dueAt
+              }
+            }
+            ... on MutationError {
+              message
+            }
+          }
+        }
+      `;
+
+      const postRes = await fetch('https://api.buffer.com', {
         method: 'POST',
         headers: {
+          'Content-Type': 'application/json',
           'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/octet-stream',
-          'X-File-Name': 'garden-express-post.png',
         },
-        body: imageBuffer,
+        body: JSON.stringify({ query: mutation }),
       });
 
-      const uploadData = await uploadRes.json();
-      if (uploadData.id) {
-        mediaIds.push(uploadData.id);
+      const postData = await postRes.json();
+
+      if (postData.errors) {
+        results.push({ channelId, success: false, error: postData.errors[0]?.message });
+      } else if (postData.data?.createPost?.message) {
+        results.push({ channelId, success: false, error: postData.data.createPost.message });
+      } else {
+        results.push({ channelId, success: true });
       }
+    } catch (error) {
+      results.push({ channelId, success: false, error: error.message });
     }
-
-    // Create the post
-    const postBody = new URLSearchParams();
-    postBody.append('text', caption);
-    channelIds.forEach(id => postBody.append('profile_ids[]', id));
-    if (mediaIds.length > 0) {
-      mediaIds.forEach(id => postBody.append('media[photo_ids][]', id));
-    }
-
-    const postRes = await fetch('https://api.bufferapp.com/1/updates/create.json', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: postBody.toString(),
-    });
-
-    const postData = await postRes.json();
-
-    if (!postRes.ok || postData.error) {
-      return res.status(postRes.status).json({ error: postData.error || 'Failed to send to Buffer' });
-    }
-
-    return res.status(200).json({ success: true, message: 'Post added to Buffer queue' });
-  } catch (error) {
-    return res.status(500).json({ error: 'Failed to send to Buffer: ' + error.message });
   }
+
+  const allSuccess = results.every(r => r.success);
+  const anySuccess = results.some(r => r.success);
+
+  return res.status(200).json({
+    success: allSuccess,
+    partial: anySuccess && !allSuccess,
+    message: allSuccess
+      ? 'Added to Buffer queue ✓'
+      : anySuccess
+        ? 'Some posts added to Buffer — check results'
+        : 'Failed to send to Buffer',
+    results,
+  });
 }

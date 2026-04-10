@@ -19,28 +19,46 @@ export default async function handler(req, res) {
     }
   }
 
+  const query = `
+    query GetChannels {
+      channels(input: {}) {
+        id
+        name
+        displayName
+        service
+        isLocked
+      }
+    }
+  `;
+
   try {
-    const response = await fetch('https://api.bufferapp.com/1/profiles.json', {
+    const response = await fetch('https://api.buffer.com', {
+      method: 'POST',
       headers: {
+        'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`,
       },
+      body: JSON.stringify({ query }),
     });
 
     const data = await response.json();
 
-    if (!response.ok) {
-      return res.status(response.status).json({ error: data.error || 'Failed to fetch Buffer channels' });
+    if (data.errors) {
+      console.error('Buffer API errors:', JSON.stringify(data.errors));
+      return res.status(500).json({ error: data.errors[0]?.message || 'Failed to fetch channels' });
     }
 
-    const channels = data.map(profile => ({
-      id: profile.id,
-      name: profile.formatted_username,
-      service: profile.service,
-      avatar: profile.avatar_https,
-    }));
+    const channels = (data.data?.channels || [])
+      .filter(ch => !ch.isLocked)
+      .map(ch => ({
+        id: ch.id,
+        name: ch.displayName || ch.name,
+        service: ch.service,
+      }));
 
     return res.status(200).json({ channels, expiryWarning });
   } catch (error) {
+    console.error('Buffer channels error:', error.message);
     return res.status(500).json({ error: 'Failed to connect to Buffer: ' + error.message });
   }
 }
