@@ -225,6 +225,7 @@ export default function App() {
   }, []);
 
   useEffect(() => { if (step === 3) drawCanvas(); }, [step, drawCanvas]);
+  useEffect(() => { if (step === 3) drawCanvas(); }, [canvasSize, barStyle, overlayText, overlayStyle, overlayPos, overlayBg, overlayFg, selectedBadge, badgeColor, logoChoice, productImg, selectedProduct]);
 
   if (!authed) return <PasswordScreen onUnlock={() => setAuthed(true)} />;
 
@@ -628,17 +629,17 @@ export default function App() {
                 <div style={s.controlSection}>
                   <span style={{ ...s.sectionLabel, marginTop: 0 }}>Canvas size</span>
                   <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                    {sizes.map(sz => <div key={sz.label} style={s.pill(canvasSize.label === sz.label)} onClick={() => { setCanvasSize(sz); drawCanvas(); }}>{sz.label}</div>)}
+                    {sizes.map(sz => <div key={sz.label} style={s.pill(canvasSize.label === sz.label)} onClick={() => { setCanvasSize(sz); }}>{sz.label}</div>)}
                   </div>
                 </div>
                 <div style={s.controlSection}>
                   <span style={{ ...s.sectionLabel, marginTop: 0 }}>Product image</span>
                   <label style={s.uploadLabel} htmlFor="productImg">Upload product photo</label>
-                  <input type="file" id="productImg" accept="image/*" style={{ display: 'none' }} onChange={e => handleFileUpload(e, img => { setProductImg(img); drawCanvas(); })} />
+                  <input type="file" id="productImg" accept="image/*" style={{ display: 'none' }} onChange={e => handleFileUpload(e, img => { setProductImg(img); })} />
                   {productImg && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6 }}>
                       <div style={{ fontSize: 12, color: BRAND.green }}>Image loaded ✓</div>
-                      <button onClick={() => { setProductImg(null); drawCanvas(); }} style={{ fontSize: 11, padding: '2px 8px', border: '1px solid #e05555', borderRadius: 6, background: '#fff', color: '#e05555', cursor: 'pointer', fontFamily: BRAND.font }}>Remove</button>
+                      <button onClick={() => { setProductImg(null); }} style={{ fontSize: 11, padding: '2px 8px', border: '1px solid #e05555', borderRadius: 6, background: '#fff', color: '#e05555', cursor: 'pointer', fontFamily: BRAND.font }}>Remove</button>
                     </div>
                   )}
                 </div>
@@ -646,7 +647,7 @@ export default function App() {
                   <span style={{ ...s.sectionLabel, marginTop: 0 }}>Garden Express logo</span>
                   <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                     {[['none', 'None'], ['full', 'Full logo'], ['flower', 'Flower icon']].map(([val, label]) => (
-                      <div key={val} style={s.pill(logoChoice === val)} onClick={() => { setLogoChoice(val); drawCanvas(); }}>{label}</div>
+                      <div key={val} style={s.pill(logoChoice === val)} onClick={() => { setLogoChoice(val); }}>{label}</div>
                     ))}
                   </div>
                   <div style={{ fontSize: 12, color: '#aaa', marginTop: 8, lineHeight: 1.5 }}>
@@ -655,37 +656,37 @@ export default function App() {
                 </div>
                 <div style={s.controlSection}>
                   <span style={{ ...s.sectionLabel, marginTop: 0 }}>Text overlay</span>
-                  <input style={{ ...s.input, marginBottom: 8 }} type="text" placeholder="e.g. New Arrival, 20% Off, Spring Sale" value={overlayText} onChange={e => { setOverlayText(e.target.value); drawCanvas(); }} />
+                  <input style={{ ...s.input, marginBottom: 8 }} type="text" placeholder="e.g. New Arrival, 20% Off, Spring Sale" value={overlayText} onChange={e => { setOverlayText(e.target.value); }} />
                   <div style={s.row2}>
                     <span style={{ fontSize: 12, color: '#666' }}>Style</span>
                     {[['banner', 'Banner'], ['pill', 'Pill'], ['burst', 'Burst']].map(([style, label]) => (
-                      <div key={style} style={{ ...s.pill(overlayStyle === style), padding: '4px 8px', fontSize: 11 }} onClick={() => { setOverlayStyle(style); drawCanvas(); }}>{label}</div>
+                      <div key={style} style={{ ...s.pill(overlayStyle === style), padding: '4px 8px', fontSize: 11 }} onClick={() => { setOverlayStyle(style); }}>{label}</div>
                     ))}
                   </div>
                   <div style={s.row2}>
                     <span style={{ fontSize: 12, color: '#666' }}>Position</span>
                     {[['top', 'Top'], ['mid', 'Middle'], ['bot', 'Bottom']].map(([pos, label]) => (
-                      <div key={pos} style={{ ...s.pill(overlayPos === pos), padding: '4px 8px', fontSize: 11 }} onClick={() => { setOverlayPos(pos); drawCanvas(); }}>{label}</div>
+                      <div key={pos} style={{ ...s.pill(overlayPos === pos), padding: '4px 8px', fontSize: 11 }} onClick={() => { setOverlayPos(pos); }}>{label}</div>
                     ))}
                   </div>
                   <div style={{ ...s.row2, marginTop: 8 }}>
                     <span style={{ fontSize: 12, color: '#666' }}>Bg</span>
-                    <input type="color" value={overlayBg} style={{ width: 32, height: 28, padding: 2, border: '1px solid #e0e8d8', borderRadius: 6, cursor: 'pointer' }} onChange={e => { setOverlayBg(e.target.value); drawCanvas(); }} />
+                    <input type="color" value={overlayBg} style={{ width: 32, height: 28, padding: 2, border: '1px solid #e0e8d8', borderRadius: 6, cursor: 'pointer' }} onChange={e => { setOverlayBg(e.target.value); }} />
                     <span style={{ fontSize: 12, color: '#666' }}>Text</span>
-                    <input type="color" value={overlayFg} style={{ width: 32, height: 28, padding: 2, border: '1px solid #e0e8d8', borderRadius: 6, cursor: 'pointer' }} onChange={e => { setOverlayFg(e.target.value); drawCanvas(); }} />
+                    <input type="color" value={overlayFg} style={{ width: 32, height: 28, padding: 2, border: '1px solid #e0e8d8', borderRadius: 6, cursor: 'pointer' }} onChange={e => { setOverlayFg(e.target.value); }} />
                   </div>
                 </div>
                 <div style={s.controlSection}>
                   <span style={{ ...s.sectionLabel, marginTop: 0 }}>Badge sticker</span>
                   <div style={s.badgeGrid}>
                     {[['', 'None'], ['new', 'NEW'], ['sale', 'SALE'], ['hot', 'HOT'], ['limited', 'LIMITED'], ['back', 'BACK IN STOCK']].map(([val, label]) => (
-                      <div key={val} style={s.badgeOpt(selectedBadge === val)} onClick={() => { setSelectedBadge(val); drawCanvas(); }}>{label}</div>
+                      <div key={val} style={s.badgeOpt(selectedBadge === val)} onClick={() => { setSelectedBadge(val); }}>{label}</div>
                     ))}
                   </div>
                   <div style={s.row2}>
                     <span style={{ fontSize: 12, color: '#666' }}>Colour</span>
                     {[['green', 'Green', BRAND.green], ['pink', 'Pink', BRAND.pink], ['amber', 'Amber', '#d68910'], ['navy', 'Navy', '#1a3a5c']].map(([col, label, hex]) => (
-                      <div key={col} style={{ ...s.pill(badgeColor === col), padding: '4px 8px', fontSize: 11, background: badgeColor === col ? hex : '#fff', borderColor: badgeColor === col ? hex : '#e0e8d8' }} onClick={() => { setBadgeColor(col); drawCanvas(); }}>{label}</div>
+                      <div key={col} style={{ ...s.pill(badgeColor === col), padding: '4px 8px', fontSize: 11, background: badgeColor === col ? hex : '#fff', borderColor: badgeColor === col ? hex : '#e0e8d8' }} onClick={() => { setBadgeColor(col); }}>{label}</div>
                     ))}
                   </div>
                 </div>
@@ -693,7 +694,7 @@ export default function App() {
                   <span style={{ ...s.sectionLabel, marginTop: 0 }}>Name bar</span>
                   <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                     {[['bottom', 'Bottom'], ['top', 'Top'], ['minimal', 'Minimal'], ['none', 'None']].map(([style, label]) => (
-                      <div key={style} style={s.pill(barStyle === style)} onClick={() => { setBarStyle(style); drawCanvas(); }}>{label}</div>
+                      <div key={style} style={s.pill(barStyle === style)} onClick={() => { setBarStyle(style); }}>{label}</div>
                     ))}
                   </div>
                 </div>
