@@ -224,8 +224,7 @@ export default function App() {
     }
   }, []);
 
-  useEffect(() => { if (step === 3) drawCanvas(); }, [step, drawCanvas]);
-  useEffect(() => { if (step === 3) drawCanvas(); }, [canvasSize, barStyle, overlayText, overlayStyle, overlayPos, overlayBg, overlayFg, selectedBadge, badgeColor, logoChoice, productImg, selectedProduct]);
+  useEffect(() => { if (step === 3) drawCanvas(); }, [step, drawCanvas, canvasSize, barStyle, overlayText, overlayStyle, overlayPos, overlayBg, overlayFg, selectedBadge, badgeColor, logoChoice, productImg, selectedProduct]);
 
   if (!authed) return <PasswordScreen onUnlock={() => setAuthed(true)} />;
 
