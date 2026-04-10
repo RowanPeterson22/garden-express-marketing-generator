@@ -3,7 +3,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { caption, imageDataUrl, channelIds } = req.body;
+  const { caption, channelIds } = req.body;
 
   if (!channelIds || channelIds.length === 0) {
     return res.status(400).json({ error: 'At least one channel is required' });
@@ -14,54 +14,15 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Buffer API key not configured' });
   }
 
+  const headers = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${apiKey}`,
+  };
+
   const results = [];
 
   for (const channelId of channelIds) {
     try {
-      // Build assets array if image provided
-      let assetsBlock = '';
-      if (imageDataUrl) {
-        const base64Data = imageDataUrl.replace(/^data:image\/\w+;base64,/, '');
-        // Upload image first
-        const uploadQuery = `
-          mutation UploadMedia($input: UploadMediaInput!) {
-            uploadMedia(input: $input) {
-              ... on UploadMediaSuccess {
-                mediaId
-              }
-              ... on MutationError {
-                message
-              }
-            }
-          }
-        `;
-
-        const uploadRes = await fetch('https://api.buffer.com', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`,
-          },
-          body: JSON.stringify({
-            query: uploadQuery,
-            variables: {
-              input: {
-                base64: base64Data,
-                mimeType: 'image/png',
-                fileName: 'garden-express-post.png',
-              }
-            }
-          }),
-        });
-
-        const uploadData = await uploadRes.json();
-        const mediaId = uploadData.data?.uploadMedia?.mediaId;
-        if (mediaId) {
-          assetsBlock = `mediaFileIds: ["${mediaId}"]`;
-        }
-      }
-
-      // Create the post
       const mutation = `
         mutation CreatePost {
           createPost(input: {
@@ -69,7 +30,6 @@ export default async function handler(req, res) {
             channelId: "${channelId}",
             schedulingType: automatic,
             mode: addToQueue
-            ${assetsBlock ? `, ${assetsBlock}` : ''}
           }) {
             ... on PostActionSuccess {
               post {
@@ -87,21 +47,21 @@ export default async function handler(req, res) {
 
       const postRes = await fetch('https://api.buffer.com', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`,
-        },
+        headers,
         body: JSON.stringify({ query: mutation }),
       });
 
       const postData = await postRes.json();
+      console.log('Buffer post response:', JSON.stringify(postData));
 
       if (postData.errors) {
         results.push({ channelId, success: false, error: postData.errors[0]?.message });
       } else if (postData.data?.createPost?.message) {
         results.push({ channelId, success: false, error: postData.data.createPost.message });
-      } else {
+      } else if (postData.data?.createPost?.post?.id) {
         results.push({ channelId, success: true });
+      } else {
+        results.push({ channelId, success: false, error: 'Unexpected response: ' + JSON.stringify(postData) });
       }
     } catch (error) {
       results.push({ channelId, success: false, error: error.message });
@@ -110,6 +70,7 @@ export default async function handler(req, res) {
 
   const allSuccess = results.every(r => r.success);
   const anySuccess = results.some(r => r.success);
+  const errorMessages = results.filter(r => !r.success).map(r => r.error).join(', ');
 
   return res.status(200).json({
     success: allSuccess,
@@ -117,8 +78,8 @@ export default async function handler(req, res) {
     message: allSuccess
       ? 'Added to Buffer queue ✓'
       : anySuccess
-        ? 'Some posts added to Buffer — check results'
-        : 'Failed to send to Buffer',
+        ? 'Some posts added — check Buffer'
+        : 'Failed to send to Buffer: ' + errorMessages,
     results,
   });
 }
