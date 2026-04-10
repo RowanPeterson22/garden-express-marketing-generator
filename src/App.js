@@ -95,6 +95,12 @@ export default function App() {
   const [authed, setAuthed] = useState(() => sessionStorage.getItem('ge_auth') === 'true');
   const [module, setModule] = useState(null);
   const [step, setStep] = useState(1);
+  const [bufferChannels, setBufferChannels] = useState([]);
+  const [bufferChannelsLoaded, setBufferChannelsLoaded] = useState(false);
+  const [selectedChannels, setSelectedChannels] = useState([]);
+  const [bufferSending, setBufferSending] = useState(false);
+  const [bufferResult, setBufferResult] = useState(null);
+  const [bufferExpiry, setBufferExpiry] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -127,7 +133,7 @@ export default function App() {
   const formatKey = canvasSize.w === 1080 && canvasSize.h === 1080 ? '1:1' : canvasSize.h === 1350 ? '4:5' : '9:16';
   const productImg = croppedImgs[formatKey];
 
-  stateRef.current = { canvasSize, barStyle, overlayText, overlayStyle, overlayPos, overlayBg, overlayFg, selectedBadge, badgeColor, logoChoice, productImg, selectedProduct, croppedImgs, formatKey };
+  stateRef.current = { canvasSize, barStyle, overlayText, overlayStyle, overlayPos, overlayBg, overlayFg, selectedBadge, badgeColor, logoChoice, productImg, selectedProduct, croppedImgs, formatKey, editedCaption };
 
   const drawCanvas = useCallback(() => {
     const { canvasSize, barStyle, overlayText, overlayStyle, overlayPos, overlayBg, overlayFg, selectedBadge, badgeColor, logoChoice, selectedProduct, croppedImgs, formatKey } = stateRef.current;
@@ -362,6 +368,49 @@ export default function App() {
     setCompletedCrop(null);
   };
 
+
+  const loadBufferChannels = async () => {
+    if (bufferChannelsLoaded) return;
+    try {
+      const res = await fetch('/api/buffer-channels');
+      const data = await res.json();
+      if (data.channels) {
+        setBufferChannels(data.channels);
+        setBufferChannelsLoaded(true);
+      }
+      if (data.expiryWarning) setBufferExpiry(data.expiryWarning);
+    } catch (e) {
+      console.error('Failed to load Buffer channels', e);
+    }
+  };
+
+  const sendToBuffer = async () => {
+    if (selectedChannels.length === 0) { alert('Please select at least one Buffer channel.'); return; }
+    if (!canvasRef.current) return;
+    setBufferSending(true);
+    setBufferResult(null);
+    try {
+      const dataUrl = canvasRef.current.toDataURL('image/png');
+      const res = await fetch('/api/buffer-post', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          caption: stateRef.current.editedCaption || '',
+          imageDataUrl: dataUrl,
+          channelIds: selectedChannels,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setBufferResult({ success: true, message: 'Added to Buffer queue ✓' });
+      } else {
+        setBufferResult({ success: false, message: data.error || 'Failed to send to Buffer' });
+      }
+    } catch (e) {
+      setBufferResult({ success: false, message: 'Failed to send to Buffer' });
+    }
+    setBufferSending(false);
+  };
 
   const downloadImage = () => {
     const { canvasSize, barStyle, overlayText, overlayStyle, overlayPos, overlayBg, overlayFg, selectedBadge, badgeColor, logoChoice, selectedProduct, croppedImgs, formatKey } = stateRef.current;
@@ -679,6 +728,41 @@ export default function App() {
                 <div style={{ display: 'flex', gap: 8 }}>
                   <button style={s.btn('default')} onClick={() => setStep(2)}>Back</button>
                   <button style={s.btn('primary')} onClick={downloadImage}>Download image</button>
+                </div>
+
+                {/* Buffer Integration */}
+                <div style={{ marginTop: 16, border: '1px solid #e0e8d8', borderRadius: 12, padding: 14, background: '#fff' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                    <div style={{ width: 20, height: 20, borderRadius: '50%', background: '#1da1f2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="#fff"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+                    </div>
+                    <span style={{ fontSize: 13, fontWeight: 500 }}>Send to Buffer</span>
+                  </div>
+                  {bufferExpiry && <div style={{ fontSize: 12, color: '#d68910', background: '#fef9e8', border: '1px solid #f0d080', borderRadius: 6, padding: '6px 10px', marginBottom: 8 }}>⚠️ {bufferExpiry}</div>}
+                  {!bufferChannelsLoaded ? (
+                    <button onClick={loadBufferChannels} style={{ ...s.btn('default'), fontSize: 13, padding: '7px 14px' }}>Load Buffer channels</button>
+                  ) : bufferChannels.length === 0 ? (
+                    <div style={{ fontSize: 13, color: '#888' }}>No Buffer channels found. Connect channels at buffer.com.</div>
+                  ) : (
+                    <>
+                      <div style={{ fontSize: 12, color: '#666', marginBottom: 6 }}>Select channels to post to:</div>
+                      {bufferChannels.map(ch => (
+                        <label key={ch.id} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, cursor: 'pointer', fontSize: 13 }}>
+                          <input type="checkbox" checked={selectedChannels.includes(ch.id)} onChange={e => setSelectedChannels(prev => e.target.checked ? [...prev, ch.id] : prev.filter(id => id !== ch.id))} style={{ accentColor: BRAND.green }} />
+                          <span style={{ textTransform: 'capitalize' }}>{ch.service}</span>
+                          <span style={{ color: '#888' }}>@{ch.name}</span>
+                        </label>
+                      ))}
+                      <button onClick={sendToBuffer} disabled={bufferSending} style={{ ...s.btn('primary'), fontSize: 13, padding: '7px 16px', marginTop: 6, opacity: bufferSending ? 0.7 : 1 }}>
+                        {bufferSending ? 'Sending...' : 'Add to Buffer queue'}
+                      </button>
+                      {bufferResult && (
+                        <div style={{ fontSize: 12, marginTop: 8, color: bufferResult.success ? BRAND.green : '#e05555' }}>
+                          {bufferResult.message}
+                        </div>
+                      )}
+                    </>
+                  )}
                 </div>
               </div>
               <div>
