@@ -374,13 +374,19 @@ export default function App() {
     try {
       const res = await fetch('/api/buffer-channels');
       const data = await res.json();
+      console.log('Buffer channels response:', data);
       if (data.channels) {
         setBufferChannels(data.channels);
         setBufferChannelsLoaded(true);
+      } else {
+        setBufferChannelsLoaded(true); // mark as loaded even on error so UI updates
+        alert('Buffer error: ' + (data.error || 'Unknown error'));
       }
       if (data.expiryWarning) setBufferExpiry(data.expiryWarning);
     } catch (e) {
       console.error('Failed to load Buffer channels', e);
+      setBufferChannelsLoaded(true);
+      alert('Failed to connect to Buffer: ' + e.message);
     }
   };
 
