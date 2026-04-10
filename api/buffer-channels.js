@@ -19,36 +19,60 @@ export default async function handler(req, res) {
     }
   }
 
-  const query = `
-    query GetChannels {
-      channels(input: {}) {
-        id
-        name
-        displayName
-        service
-        isLocked
-      }
-    }
-  `;
+  const headers = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${apiKey}`,
+  };
 
   try {
-    const response = await fetch('https://api.buffer.com', {
+    // Step 1: Get the organisation ID
+    const orgRes = await fetch('https://api.buffer.com', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({ query }),
+      headers,
+      body: JSON.stringify({
+        query: `query { account { currentOrganization { id name } } }`,
+      }),
     });
 
-    const data = await response.json();
+    const orgData = await orgRes.json();
+    console.log('Buffer org response:', JSON.stringify(orgData));
 
-    if (data.errors) {
-      console.error('Buffer API errors:', JSON.stringify(data.errors));
-      return res.status(500).json({ error: data.errors[0]?.message || 'Failed to fetch channels' });
+    if (orgData.errors) {
+      return res.status(500).json({ error: orgData.errors[0]?.message || 'Failed to fetch organisation' });
     }
 
-    const channels = (data.data?.channels || [])
+    const orgId = orgData.data?.account?.currentOrganization?.id;
+    if (!orgId) {
+      return res.status(500).json({ error: 'Could not find Buffer organisation ID' });
+    }
+
+    // Step 2: Get channels for this organisation
+    const channelsRes = await fetch('https://api.buffer.com', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        query: `
+          query GetChannels {
+            channels(input: { organizationId: "${orgId}" }) {
+              id
+              name
+              displayName
+              service
+              isLocked
+            }
+          }
+        `,
+      }),
+    });
+
+    const channelsData = await channelsRes.json();
+    console.log('Buffer channels response:', JSON.stringify(channelsData));
+
+    if (channelsData.errors) {
+      return res.status(500).json({ error: channelsData.errors[0]?.message || 'Failed to fetch channels' });
+    }
+
+    const channels = (channelsData.data?.channels || [])
       .filter(ch => !ch.isLocked)
       .map(ch => ({
         id: ch.id,
