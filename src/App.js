@@ -114,18 +114,24 @@ export default function App() {
   const [selectedBadge, setSelectedBadge] = useState('');
   const [badgeColor, setBadgeColor] = useState('green');
   const [logoChoice, setLogoChoice] = useState('none');
-  const [productImg, setProductImg] = useState(null);
   const [cropSrc, setCropSrc] = useState(null);
+  const [cropFormat, setCropFormat] = useState(null);
   const [crop, setCrop] = useState({ unit: '%', width: 80, height: 80, x: 10, y: 10 });
   const [completedCrop, setCompletedCrop] = useState(null);
+  const [croppedImgs, setCroppedImgs] = useState({ '1:1': null, '4:5': null, '9:16': null });
+  const [rawImgSrc, setRawImgSrc] = useState(null);
   const cropImgRef = useRef(null);
   const canvasRef = useRef(null);
   const stateRef = useRef({});
 
-  stateRef.current = { canvasSize, barStyle, overlayText, overlayStyle, overlayPos, overlayBg, overlayFg, selectedBadge, badgeColor, logoChoice, productImg, selectedProduct };
+  const formatKey = canvasSize.w === 1080 && canvasSize.h === 1080 ? '1:1' : canvasSize.h === 1350 ? '4:5' : '9:16';
+  const productImg = croppedImgs[formatKey];
+
+  stateRef.current = { canvasSize, barStyle, overlayText, overlayStyle, overlayPos, overlayBg, overlayFg, selectedBadge, badgeColor, logoChoice, productImg, selectedProduct, croppedImgs, formatKey };
 
   const drawCanvas = useCallback(() => {
-    const { canvasSize, barStyle, overlayText, overlayStyle, overlayPos, overlayBg, overlayFg, selectedBadge, badgeColor, logoChoice, productImg, selectedProduct } = stateRef.current;
+    const { canvasSize, barStyle, overlayText, overlayStyle, overlayPos, overlayBg, overlayFg, selectedBadge, badgeColor, logoChoice, selectedProduct, croppedImgs, formatKey } = stateRef.current;
+    const productImg = croppedImgs[formatKey];
     if (!canvasRef.current || !selectedProduct) return;
     const cv = canvasRef.current;
     const scale = Math.min(480 / canvasSize.w, 480 / canvasSize.h);
@@ -230,7 +236,7 @@ export default function App() {
     }
   }, []);
 
-  useEffect(() => { if (step === 3) drawCanvas(); }, [step, drawCanvas, canvasSize, barStyle, overlayText, overlayStyle, overlayPos, overlayBg, overlayFg, selectedBadge, badgeColor, logoChoice, productImg, selectedProduct]);
+  useEffect(() => { if (step === 3) drawCanvas(); }, [step, drawCanvas, canvasSize, barStyle, overlayText, overlayStyle, overlayPos, overlayBg, overlayFg, selectedBadge, badgeColor, logoChoice, croppedImgs, selectedProduct]);
 
   if (!authed) return <PasswordScreen onUnlock={() => setAuthed(true)} />;
 
@@ -317,13 +323,28 @@ export default function App() {
     const ctx = canvas.getContext('2d');
     ctx.drawImage(image, completedCrop.x * scaleX, completedCrop.y * scaleY, completedCrop.width * scaleX, completedCrop.height * scaleY, 0, 0, canvas.width, canvas.height);
     const croppedImg = new Image();
-    croppedImg.onload = () => { setProductImg(croppedImg); setCropSrc(null); };
+    croppedImg.onload = () => {
+      setCroppedImgs(prev => ({ ...prev, [cropFormat]: croppedImg }));
+      setCropSrc(null);
+      setCropFormat(null);
+    };
     croppedImg.src = canvas.toDataURL('image/png');
+  };
+
+  const openCrop = (format) => {
+    if (!rawImgSrc) return;
+    const aspectMap = { '1:1': 1, '4:5': 4/5, '9:16': 9/16 };
+    const aspect = aspectMap[format];
+    setCropFormat(format);
+    setCropSrc(rawImgSrc);
+    setCrop({ unit: '%', width: 80, height: 80 * aspect, x: 10, y: 10 });
+    setCompletedCrop(null);
   };
 
 
   const downloadImage = () => {
-    const { canvasSize, barStyle, overlayText, overlayStyle, overlayPos, overlayBg, overlayFg, selectedBadge, badgeColor, logoChoice, productImg, selectedProduct } = stateRef.current;
+    const { canvasSize, barStyle, overlayText, overlayStyle, overlayPos, overlayBg, overlayFg, selectedBadge, badgeColor, logoChoice, selectedProduct, croppedImgs, formatKey } = stateRef.current;
+    const productImg = croppedImgs[formatKey];
     if (!canvasRef.current || !selectedProduct) return;
     const W = canvasSize.w, H = canvasSize.h;
     const full = document.createElement('canvas');
@@ -652,14 +673,35 @@ export default function App() {
                   <input type="file" id="productImg" accept="image/*" style={{ display: 'none' }} onChange={e => {
                     const file = e.target.files[0]; if (!file) return;
                     const reader = new FileReader();
-                    reader.onload = ev => { setCropSrc(ev.target.result); setCrop({ unit: '%', width: 80, height: 80, x: 10, y: 10 }); setCompletedCrop(null); };
+                    reader.onload = ev => {
+                      const src = ev.target.result;
+                      setRawImgSrc(src);
+                      setCroppedImgs({ '1:1': null, '4:5': null, '9:16': null });
+                      const aspectMap = { '1:1': 1, '4:5': 4/5, '9:16': 9/16 };
+                      const aspect = aspectMap[formatKey];
+                      setCropFormat(formatKey);
+                      setCropSrc(src);
+                      setCrop({ unit: '%', width: 80, height: 80 * aspect, x: 10, y: 10 });
+                      setCompletedCrop(null);
+                    };
                     reader.readAsDataURL(file);
                     e.target.value = '';
                   }} />
-                  {productImg && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6 }}>
-                      <div style={{ fontSize: 12, color: BRAND.green }}>Image loaded ✓</div>
-                      <button onClick={() => { setProductImg(null); }} style={{ fontSize: 11, padding: '2px 8px', border: '1px solid #e05555', borderRadius: 6, background: '#fff', color: '#e05555', cursor: 'pointer', fontFamily: BRAND.font }}>Remove</button>
+                  {rawImgSrc && (
+                    <div style={{ marginTop: 8 }}>
+                      <div style={{ fontSize: 12, color: '#666', marginBottom: 6 }}>Crop per format:</div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                        {[['1:1', 'Feed 1:1'], ['4:5', 'Portrait 4:5'], ['9:16', 'Story 9:16']].map(([fmt, label]) => (
+                          <div key={fmt} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <span style={{ fontSize: 12, color: '#666' }}>{label}</span>
+                            <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                              {croppedImgs[fmt] ? <span style={{ fontSize: 11, color: BRAND.green }}>✓ cropped</span> : <span style={{ fontSize: 11, color: '#bbb' }}>not cropped</span>}
+                              <button onClick={() => openCrop(fmt)} style={{ fontSize: 11, padding: '2px 10px', border: `1px solid ${BRAND.green}`, borderRadius: 6, background: '#fff', color: BRAND.green, cursor: 'pointer', fontFamily: BRAND.font }}>{croppedImgs[fmt] ? 'Re-crop' : 'Crop'}</button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <button onClick={() => { setRawImgSrc(null); setCroppedImgs({ '1:1': null, '4:5': null, '9:16': null }); }} style={{ marginTop: 8, fontSize: 11, padding: '2px 8px', border: '1px solid #e05555', borderRadius: 6, background: '#fff', color: '#e05555', cursor: 'pointer', fontFamily: BRAND.font }}>Remove image</button>
                     </div>
                   )}
                 </div>
@@ -726,13 +768,18 @@ export default function App() {
       {cropSrc && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 24 }}>
           <div style={{ background: '#fff', borderRadius: 16, padding: 24, maxWidth: 600, width: '100%', maxHeight: '90vh', overflowY: 'auto' }}>
-            <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 4, color: '#1a1a1a' }}>Crop image</div>
-            <div style={{ fontSize: 13, color: '#888', marginBottom: 16 }}>Drag to select the area you want to use</div>
-            <ReactCrop crop={crop} onChange={c => setCrop(c)} onComplete={c => setCompletedCrop(c)}>
+            <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 4, color: '#1a1a1a' }}>Crop for {cropFormat === '1:1' ? 'Feed 1:1' : cropFormat === '4:5' ? 'Portrait 4:5' : 'Story 9:16'}</div>
+            <div style={{ fontSize: 13, color: '#888', marginBottom: 16 }}>Drag to select — aspect ratio is locked to match this canvas format</div>
+            <ReactCrop
+              crop={crop}
+              onChange={c => setCrop(c)}
+              onComplete={c => setCompletedCrop(c)}
+              aspect={cropFormat === '1:1' ? 1 : cropFormat === '4:5' ? 4/5 : 9/16}
+            >
               <img ref={cropImgRef} src={cropSrc} alt="crop preview" style={{ maxWidth: '100%', maxHeight: '60vh' }} />
             </ReactCrop>
             <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
-              <button onClick={() => setCropSrc(null)} style={{ padding: '9px 18px', border: '1px solid #ccc', borderRadius: 8, background: '#fff', fontSize: 14, cursor: 'pointer', fontFamily: BRAND.font }}>Cancel</button>
+              <button onClick={() => { setCropSrc(null); setCropFormat(null); }} style={{ padding: '9px 18px', border: '1px solid #ccc', borderRadius: 8, background: '#fff', fontSize: 14, cursor: 'pointer', fontFamily: BRAND.font }}>Cancel</button>
               <button onClick={confirmCrop} style={{ padding: '9px 18px', border: `1px solid ${BRAND.green}`, borderRadius: 8, background: BRAND.green, color: '#fff', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: BRAND.font }}>Use this crop</button>
             </div>
           </div>
