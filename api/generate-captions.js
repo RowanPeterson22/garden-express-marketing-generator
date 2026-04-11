@@ -3,7 +3,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { product, price, wasPrice, description, postType } = req.body;
+  const { product, price, wasPrice, description, postType, includePrices } = req.body;
 
   if (!product) {
     return res.status(400).json({ error: 'Product is required' });
@@ -16,6 +16,10 @@ export default async function handler(req, res) {
     seasonal: 'Write 3 seasonal captions tying this product to the current season (consider Australian seasons).',
   };
 
+  const priceInfo = includePrices !== false
+    ? `Price: ${price || ''}${wasPrice ? `\nWas: ${wasPrice} (this is a special/sale price — mention the saving)` : ''}`
+    : `Price: Do not mention the price in the caption.`;
+
   const prompt = `You are a social media copywriter for Garden Express Australia, a premium home and garden nursery.
 
 Brand tone of voice: Warm, knowledgeable and passionate about plants and gardening. Conversational and inspiring — never corporate. Celebrate the joy of gardening, the beauty of plants, and the transformation a great garden brings to people's lives.
@@ -23,7 +27,7 @@ Brand tone of voice: Warm, knowledgeable and passionate about plants and gardeni
 Task: ${typePrompts[postType] || typePrompts.product}
 
 Product: ${product}
-Price: ${price || ''}${wasPrice ? `\nWas: ${wasPrice} (this is a special/sale price — mention the saving)` : ''}
+${priceInfo}
 Description: ${description || ''}
 
 Rules:
@@ -54,9 +58,6 @@ Respond with ONLY a JSON object — no markdown, no explanation, no backticks:
     });
 
     const data = await response.json();
-
-    console.log('Anthropic response status:', response.status);
-    console.log('Anthropic response:', JSON.stringify(data).slice(0, 500));
 
     if (data.error) {
       return res.status(500).json({ error: data.error.message });

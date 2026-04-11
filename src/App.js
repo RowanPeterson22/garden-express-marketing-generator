@@ -106,6 +106,7 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [postType, setPostType] = useState('product');
+  const [includePrices, setIncludePrices] = useState(true);
   const [captions, setCaptions] = useState([]);
   const [selectedCaption, setSelectedCaption] = useState('');
   const [editedCaption, setEditedCaption] = useState('');
@@ -309,7 +310,7 @@ export default function App() {
       const res = await fetch('/api/generate-captions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ product: selectedProduct.name, price: selectedProduct.price, wasPrice: selectedProduct.wasPrice || null, description: selectedProduct.desc, postType }),
+        body: JSON.stringify({ product: selectedProduct.name, price: selectedProduct.price, wasPrice: selectedProduct.wasPrice || null, description: selectedProduct.desc, postType, includePrices }),
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
@@ -378,6 +379,7 @@ export default function App() {
     setSearchQuery('');
     setSelectedCategory('All');
     setPostType('product');
+    setIncludePrices(true);
     setCaptions([]);
     setSelectedCaption('');
     setEditedCaption('');
@@ -691,7 +693,11 @@ export default function App() {
                 </div>
               ))}
             </div>
-            <div style={s.infoBox}>Click <strong>Generate captions</strong> — we'll write 3 options using the Garden Express tone of voice.</div>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#555', marginBottom: 14, cursor: 'pointer', userSelect: 'none' }}>
+              <input type="checkbox" checked={includePrices} onChange={e => setIncludePrices(e.target.checked)} style={{ width: 16, height: 16, accentColor: BRAND.green, cursor: 'pointer' }} />
+              Include price in caption
+            </label>
+            <div style={s.infoBox}>Click <strong>Generate caption ideas</strong> — we'll write 3 options using the Garden Express tone of voice.</div>
             <div style={{ display: 'flex', gap: 8, marginBottom: 16, alignItems: 'center', flexWrap: 'wrap' }}>
               <button style={s.btn('primary')} onClick={generateCaptions} disabled={generating}>
                 {generating ? 'Generating...' : captions.length ? 'Regenerate caption ideas' : 'Generate caption ideas'}
