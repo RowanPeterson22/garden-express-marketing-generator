@@ -413,6 +413,7 @@ export default function App() {
           caption: editedCaption,
           imageDataUrl,
           channelIds: selectedChannels,
+          channelServices: selectedChannels.map(id => bufferChannels.find(ch => ch.id === id)?.service || 'instagram'),
           canvasLabel: canvasSize.label,
         }),
       });

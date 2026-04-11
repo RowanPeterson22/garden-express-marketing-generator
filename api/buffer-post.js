@@ -5,7 +5,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { caption, imageDataUrl, channelIds, canvasLabel } = req.body;
+  const { caption, imageDataUrl, channelIds, channelServices, canvasLabel } = req.body;
 
   if (!channelIds || channelIds.length === 0) {
     return res.status(400).json({ error: 'At least one channel is required' });
@@ -54,8 +54,19 @@ export default async function handler(req, res) {
 
   const results = [];
 
-  for (const channelId of channelIds) {
+  for (let i = 0; i < channelIds.length; i++) {
+    const channelId = channelIds[i];
+    const service = channelServices?.[i] || 'instagram';
+
     try {
+      // Build metadata block based on platform
+      let metadataBlock = '';
+      if (service === 'instagram') {
+        metadataBlock = `metadata: { instagram: { type: ${postType}, shouldShareToFeed: true } }`;
+      } else if (service === 'facebook') {
+        metadataBlock = `metadata: { facebook: { type: ${postType} } }`;
+      }
+
       const assetsBlock = imageUrl
         ? `assets: { images: [{ url: "${imageUrl}" }] }`
         : '';
@@ -68,6 +79,7 @@ export default async function handler(req, res) {
             schedulingType: automatic,
             mode: addToQueue
             ${assetsBlock}
+            ${metadataBlock}
           }) {
             ... on PostActionSuccess {
               post {
@@ -106,8 +118,7 @@ export default async function handler(req, res) {
     }
   }
 
-  // Clean up blob after Buffer has received the URL
-  // Give Buffer a moment to fetch it before deleting
+  // Clean up blob after 30 seconds
   if (blobUrl) {
     setTimeout(async () => {
       try {
@@ -116,7 +127,7 @@ export default async function handler(req, res) {
       } catch (e) {
         console.error('Blob cleanup failed:', e.message);
       }
-    }, 30000); // delete after 30 seconds
+    }, 30000);
   }
 
   const allSuccess = results.every(r => r.success);
