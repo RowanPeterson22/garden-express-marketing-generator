@@ -392,6 +392,7 @@ export default function App() {
 
   const sendToBuffer = async () => {
     if (selectedChannels.length === 0) { alert('Please select at least one Buffer channel.'); return; }
+    if (!stateRef.current.editedCaption?.trim()) { alert('Please add a caption before sending to Buffer.'); return; }
     if (!canvasRef.current) return;
     setBufferSending(true);
     setBufferResult(null);
