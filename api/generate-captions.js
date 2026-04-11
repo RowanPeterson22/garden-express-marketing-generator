@@ -23,7 +23,7 @@ export default async function handler(req, res) {
   const stockInfo = stock !== undefined
     ? stock < 10
       ? `Stock: Only ${stock} remaining — do NOT promote this product. Do not write captions encouraging purchase.`
-      : stock <= 20
+      : stock <= 30
         ? `Stock: Only ${stock} remaining — mention urgency naturally (e.g. "limited stock", "don't miss out", "selling fast")`
         : stock <= 50
           ? `Stock: Low stock (${stock} left) — you may subtly hint at availability if appropriate`
