@@ -301,8 +301,6 @@ export default function App() {
     return matchesSearch && matchesCat;
   });
 
-  });
-
   if (module === 'brand') return (
     <div style={{ fontFamily: BRAND.font, minHeight: '100vh', background: '#f7f9f5', color: '#1a1a1a' }}>
       <link rel="preconnect" href="https://fonts.googleapis.com" />
