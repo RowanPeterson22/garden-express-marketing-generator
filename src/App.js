@@ -392,7 +392,7 @@ export default function App() {
 
   const sendToBuffer = async () => {
     if (selectedChannels.length === 0) { alert('Please select at least one Buffer channel.'); return; }
-    if (!stateRef.current.editedCaption?.trim()) { alert('Please add a caption before sending to Buffer.'); return; }
+    if (!stateRef.current.editedCaption?.trim() && !canvasRef.current) { alert('Please add a caption or image before sending to Buffer.'); return; }
     if (!canvasRef.current) return;
     setBufferSending(true);
     setBufferResult(null);
@@ -854,7 +854,7 @@ export default function App() {
                 </div>
                 <div style={s.controlSection}>
                   <span style={{ ...s.sectionLabel, marginTop: 0 }}>Text overlay</span>
-                  <input style={{ ...s.input, marginBottom: 8 }} type="text" placeholder="e.g. New Arrival, 20% Off, Spring Sale" value={overlayText} onChange={e => { setOverlayText(e.target.value); }} />
+                  <input style={{ ...s.input, marginBottom: 8 }} type="text" placeholder="e.g. New Arrival, 20% Off" value={overlayText} onChange={e => { setOverlayText(e.target.value); }} />
                   <div style={s.row2}>
                     <span style={{ fontSize: 12, color: '#666' }}>Style</span>
                     {[['banner', 'Banner'], ['pill', 'Pill'], ['burst', 'Burst']].map(([style, label]) => (

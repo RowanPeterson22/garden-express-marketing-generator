@@ -11,8 +11,8 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'At least one channel is required' });
   }
 
-  if (!caption || !caption.trim()) {
-    return res.status(400).json({ error: 'A caption is required to post to Buffer' });
+  if (!caption?.trim() && !imageDataUrl) {
+    return res.status(400).json({ error: 'A caption or image is required to post to Buffer' });
   }
 
   const apiKey = process.env.BUFFER_API_KEY;
@@ -74,7 +74,7 @@ export default async function handler(req, res) {
       const mutation = `
         mutation CreatePost {
           createPost(input: {
-            text: ${JSON.stringify(caption.trim())},
+            text: ${JSON.stringify((caption || '').trim())},
             channelId: "${channelId}",
             schedulingType: automatic,
             mode: addToQueue
