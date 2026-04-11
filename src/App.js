@@ -137,7 +137,7 @@ export default function App() {
   const formatKey = canvasSize.w === 1080 && canvasSize.h === 1080 ? '1:1' : canvasSize.h === 1350 ? '4:5' : '9:16';
   const productImg = croppedImgs[formatKey];
 
-  stateRef.current = { canvasSize, barStyle, overlayText, overlayStyle, overlayPos, overlayBg, overlayFg, selectedBadge, badgeColor, logoChoice, productImg, selectedProduct, croppedImgs, formatKey, editedCaption };
+  stateRef.current = { canvasSize, barStyle, overlayText, overlayStyle, overlayPos, overlayBg, overlayFg, selectedBadge, badgeColor, logoChoice, productImg, selectedProduct, croppedImgs, formatKey, editedCaption, includePrices, useEmojis };
 
   const drawCanvas = useCallback(() => {
     const { canvasSize, barStyle, overlayText, overlayStyle, overlayPos, overlayBg, overlayFg, selectedBadge, badgeColor, logoChoice, selectedProduct, croppedImgs, formatKey } = stateRef.current;
@@ -307,11 +307,12 @@ export default function App() {
     setSelectedCaption('');
     setEditedCaption('');
     setWriteOwn(false);
+    const { includePrices: ip, useEmojis: ue, selectedProduct: sp } = stateRef.current;
     try {
       const res = await fetch('/api/generate-captions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ product: selectedProduct.name, price: selectedProduct.price, wasPrice: selectedProduct.wasPrice || null, stock: selectedProduct.stock, description: selectedProduct.desc, postType, includePrices, useEmojis }),
+        body: JSON.stringify({ product: sp.name, price: sp.price, wasPrice: sp.wasPrice || null, stock: sp.stock, description: sp.desc, postType, includePrices: ip, useEmojis: ue }),
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
