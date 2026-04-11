@@ -3,7 +3,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { product, price, wasPrice, description, postType, includePrices } = req.body;
+  const { product, price, wasPrice, description, postType, includePrices, stock } = req.body;
 
   if (!product) {
     return res.status(400).json({ error: 'Product is required' });
@@ -20,6 +20,14 @@ export default async function handler(req, res) {
     ? `Price: ${price || ''}${wasPrice ? `\nWas: ${wasPrice} (this is a special/sale price — mention the saving)` : ''}`
     : `Price: Do not mention the price in the caption.`;
 
+  const stockInfo = stock !== undefined
+    ? stock <= 5
+      ? `Stock: Only ${stock} remaining — mention urgency naturally (e.g. "limited stock", "don't miss out", "selling fast")`
+      : stock <= 10
+        ? `Stock: Low stock (${stock} left) — you may subtly hint at availability if appropriate`
+        : `Stock: Good availability — no need to mention stock`
+    : '';
+
   const prompt = `You are a social media copywriter for Garden Express Australia, a premium home and garden nursery.
 
 Brand tone of voice: Warm, knowledgeable and passionate about plants and gardening. Conversational and inspiring — never corporate. Celebrate the joy of gardening, the beauty of plants, and the transformation a great garden brings to people's lives.
@@ -28,6 +36,7 @@ Task: ${typePrompts[postType] || typePrompts.product}
 
 Product: ${product}
 ${priceInfo}
+${stockInfo}
 Description: ${description || ''}
 
 Rules:

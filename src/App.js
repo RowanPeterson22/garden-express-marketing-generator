@@ -11,21 +11,21 @@ const BRAND = {
 };
 
 const PRODUCTS = [
-  { id: 1, name: 'Crimson Queen Japanese Maple', cat: 'Trees', price: '$89.00', desc: 'Stunning laceleaf Japanese maple with deep crimson foliage. Perfect for containers or garden beds.', emoji: '🍁' },
-  { id: 2, name: 'Lavender Hidcote', cat: 'Perennials', price: '$14.95', desc: 'Classic English lavender with deep purple flowers and strong fragrance. Drought tolerant once established.', emoji: '💜' },
-  { id: 3, name: 'Iceberg Rose', cat: 'Roses', price: '$24.95', desc: "Australia's most popular rose. Pure white blooms all season, disease resistant and easy to grow.", emoji: '🌹' },
-  { id: 4, name: 'Lilly Pilly Resilience', cat: 'Hedging', price: '$19.95', desc: 'Fast growing native hedge plant with glossy foliage and psyllid resistance. Great for privacy screens.', emoji: '🌿' },
-  { id: 5, name: 'Buxus Sempervirens', cat: 'Hedging', price: '$16.95', desc: 'Classic English box hedge. Dense evergreen foliage, ideal for formal gardens and topiary.', emoji: '🌳' },
-  { id: 6, name: 'Agapanthus Storm Cloud', cat: 'Perennials', price: '$18.95', desc: 'Deep violet-blue flowers on tall stems. Perfect for mass planting or as a border plant.', emoji: '💙' },
-  { id: 7, name: 'Camellia Donation', cat: 'Shrubs', price: '$39.95', desc: 'Semi-double pink flowers in winter and spring. One of the most reliable and beautiful camellias.', emoji: '🌸' },
-  { id: 8, name: 'Wisteria Sinensis', cat: 'Climbers', price: '$29.95', desc: 'Spectacular cascading purple flowers in spring. Vigorous climber for pergolas and fences.', emoji: '🪻' },
-  { id: 9, name: 'Garlic Bulbs (10 pack)', cat: 'Edibles', price: '$12.95', desc: 'Premium Australian grown garlic bulbs. Plant now for a bumper summer harvest.', emoji: '🧄' },
-  { id: 10, name: 'Blueberry Sunshine Blue', cat: 'Edibles', price: '$34.95', desc: 'Compact blueberry perfect for pots or small gardens. Self-fertile with masses of sweet berries.', emoji: '🫐' },
-  { id: 11, name: 'Potting Mix Premium 30L', cat: 'Soils & Mulch', price: '$18.95', desc: 'Professional grade potting mix with controlled release fertiliser. Perfect for containers and raised beds.', emoji: '🪴' },
-  { id: 12, name: 'Seasol Concentrate 1L', cat: 'Fertilisers', price: '$22.95', desc: "Australia's favourite garden tonic. Improves soil health and plant resilience naturally.", emoji: '🌱' },
-  { id: 13, name: 'Camellia Jury\'s Yellow', cat: 'Specials', price: '$19.95', wasPrice: '$34.95', desc: 'Stunning semi-double yellow camellia flowers in winter. A rare and beautiful variety now on special.', emoji: '🌼' },
-  { id: 14, name: 'Agapanthus Blue Storm', cat: 'Specials', price: '$12.95', wasPrice: '$22.95', desc: 'Deep blue agapanthus with tall flower stems. Perfect for borders and mass planting. Limited stock.', emoji: '💙' },
-  { id: 15, name: 'Wisteria Blue Moon', cat: 'Specials', price: '$19.95', wasPrice: '$39.95', desc: 'Spectacular fragrant blue-purple flowers. One of the most cold-hardy wisterias available. Clearance price.', emoji: '🪻' },
+  { id: 1, name: 'Crimson Queen Japanese Maple', cat: 'Trees', price: '$89.00', stock: 8, desc: 'Stunning laceleaf Japanese maple with deep crimson foliage. Perfect for containers or garden beds.', emoji: '🍁' },
+  { id: 2, name: 'Lavender Hidcote', cat: 'Perennials', price: '$14.95', stock: 120, desc: 'Classic English lavender with deep purple flowers and strong fragrance. Drought tolerant once established.', emoji: '💜' },
+  { id: 3, name: 'Iceberg Rose', cat: 'Roses', price: '$24.95', stock: 45, desc: "Australia's most popular rose. Pure white blooms all season, disease resistant and easy to grow.", emoji: '🌹' },
+  { id: 4, name: 'Lilly Pilly Resilience', cat: 'Hedging', price: '$19.95', stock: 200, desc: 'Fast growing native hedge plant with glossy foliage and psyllid resistance. Great for privacy screens.', emoji: '🌿' },
+  { id: 5, name: 'Buxus Sempervirens', cat: 'Hedging', price: '$16.95', stock: 85, desc: 'Classic English box hedge. Dense evergreen foliage, ideal for formal gardens and topiary.', emoji: '🌳' },
+  { id: 6, name: 'Agapanthus Storm Cloud', cat: 'Perennials', price: '$18.95', stock: 60, desc: 'Deep violet-blue flowers on tall stems. Perfect for mass planting or as a border plant.', emoji: '💙' },
+  { id: 7, name: 'Camellia Donation', cat: 'Shrubs', price: '$39.95', stock: 12, desc: 'Semi-double pink flowers in winter and spring. One of the most reliable and beautiful camellias.', emoji: '🌸' },
+  { id: 8, name: 'Wisteria Sinensis', cat: 'Climbers', price: '$29.95', stock: 30, desc: 'Spectacular cascading purple flowers in spring. Vigorous climber for pergolas and fences.', emoji: '🪻' },
+  { id: 9, name: 'Garlic Bulbs (10 pack)', cat: 'Edibles', price: '$12.95', stock: 150, desc: 'Premium Australian grown garlic bulbs. Plant now for a bumper summer harvest.', emoji: '🧄' },
+  { id: 10, name: 'Blueberry Sunshine Blue', cat: 'Edibles', price: '$34.95', stock: 22, desc: 'Compact blueberry perfect for pots or small gardens. Self-fertile with masses of sweet berries.', emoji: '🫐' },
+  { id: 11, name: 'Potting Mix Premium 30L', cat: 'Soils & Mulch', price: '$18.95', stock: 300, desc: 'Professional grade potting mix with controlled release fertiliser. Perfect for containers and raised beds.', emoji: '🪴' },
+  { id: 12, name: 'Seasol Concentrate 1L', cat: 'Fertilisers', price: '$22.95', stock: 180, desc: "Australia's favourite garden tonic. Improves soil health and plant resilience naturally.", emoji: '🌱' },
+  { id: 13, name: "Camellia Jury's Yellow", cat: 'Specials', price: '$19.95', wasPrice: '$34.95', stock: 5, desc: 'Stunning semi-double yellow camellia flowers in winter. A rare and beautiful variety now on special.', emoji: '🌼' },
+  { id: 14, name: 'Agapanthus Blue Storm', cat: 'Specials', price: '$12.95', wasPrice: '$22.95', stock: 3, desc: 'Deep blue agapanthus with tall flower stems. Perfect for borders and mass planting. Limited stock.', emoji: '💙' },
+  { id: 15, name: 'Wisteria Blue Moon', cat: 'Specials', price: '$19.95', wasPrice: '$39.95', stock: 7, desc: 'Spectacular fragrant blue-purple flowers. One of the most cold-hardy wisterias available. Clearance price.', emoji: '🪻' },
 ];
 
 const CATEGORIES = ['All', ...new Set(PRODUCTS.map(p => p.cat))];
@@ -310,7 +310,7 @@ export default function App() {
       const res = await fetch('/api/generate-captions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ product: selectedProduct.name, price: selectedProduct.price, wasPrice: selectedProduct.wasPrice || null, description: selectedProduct.desc, postType, includePrices }),
+        body: JSON.stringify({ product: selectedProduct.name, price: selectedProduct.price, wasPrice: selectedProduct.wasPrice || null, stock: selectedProduct.stock, description: selectedProduct.desc, postType, includePrices }),
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
@@ -658,6 +658,11 @@ export default function App() {
                   ) : (
                     <div style={{ fontSize: 12, color: '#666' }}>{p.price}</div>
                   )}
+                  {p.stock <= 10 && (
+                    <div style={{ fontSize: 11, marginTop: 3, color: p.stock <= 5 ? '#e05555' : '#e07f2a', fontWeight: 500 }}>
+                      {p.stock <= 5 ? `⚠️ Only ${p.stock} left` : `🔶 Low stock — ${p.stock} left`}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -677,6 +682,11 @@ export default function App() {
                 </>
               ) : (
                 <span style={s.tag('pink')}>{selectedProduct?.price}</span>
+              )}
+              {selectedProduct?.stock <= 10 && (
+                <span style={{ fontSize: 11, color: selectedProduct.stock <= 5 ? '#e05555' : '#e07f2a', fontWeight: 500 }}>
+                  {selectedProduct.stock <= 5 ? `⚠️ Only ${selectedProduct.stock} left` : `🔶 ${selectedProduct.stock} left`}
+                </span>
               )}
             </div>
             <span style={{ ...s.sectionLabel, marginTop: 0 }}>Post type</span>
