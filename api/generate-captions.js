@@ -43,7 +43,13 @@ Description: ${description || ''}
 
 Rules:
 - Each caption is 2-4 sentences
-- ${includeHashtags !== false ? 'Include 4-6 relevant hashtags at the end' : 'Do not include any hashtags'}
+- ${includeHashtags !== false ? `Include 4-6 hashtags at the end. You MUST only use hashtags from this approved list — do not invent or modify any hashtags:
+  General: #GardenExpress #GardenExpressAustralia #ShopOnline #OnlineNursery #AustralianGarden #AussieGarden #GardenLovers #GardenLife #GardenInspiration #GardenDesign #GardenStyle #GardeningAustralia #Gardening #GardenCommunity #PlantLovers #PlantLife #PlantParent #Horticulture
+  Plants & Trees: #Trees #NativePlants #AustralianNatives #Natives #Shrubs #Perennials #Roses #Climbers #Hedging #Succulents #IndoorPlants #OutdoorPlants #Flowering #FloweringPlants #OrnamentalGrasses
+  Edibles: #VeggieGarden #EdibleGarden #GrowYourOwn #HomeGrown #KitchenGarden #Herbs #FruitTrees #Berries #Vegetables
+  Seasonal: #SpringGardening #SummerGarden #AutumnGarden #WinterGarden #SpringPlanting #SeasonalGardening
+  Lifestyle: #OutdoorLiving #BackyardGoals #BackyardGarden #HomeGarden #FrontYard #BackYard #GardenMakeover #GardenTransformation #GreenThumb #PlantTherapy #GardenPhotography
+  Select the most relevant 4-6 from this list only.` : 'Do not include any hashtags'}
 - End with a gentle call to action directing customers to shop online — Garden Express is online only, never mention visiting in-store
 - Reflect Australian gardening seasons and lifestyle where relevant
 - Never use exclamation marks excessively — one per caption maximum
