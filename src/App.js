@@ -658,9 +658,9 @@ export default function App() {
                   ) : (
                     <div style={{ fontSize: 12, color: '#666' }}>{p.price}</div>
                   )}
-                  {p.stock <= 10 && (
-                    <div style={{ fontSize: 11, marginTop: 3, color: p.stock <= 5 ? '#e05555' : '#e07f2a', fontWeight: 500 }}>
-                      {p.stock <= 5 ? `⚠️ Only ${p.stock} left` : `🔶 Low stock — ${p.stock} left`}
+                  {p.stock <= 50 && (
+                    <div style={{ fontSize: 11, marginTop: 3, color: p.stock <= 20 ? '#e05555' : '#e07f2a', fontWeight: 500 }}>
+                      {p.stock <= 20 ? `⚠️ Only ${p.stock} left` : `🔶 Low stock — ${p.stock} left`}
                     </div>
                   )}
                 </div>
@@ -683,9 +683,9 @@ export default function App() {
               ) : (
                 <span style={s.tag('pink')}>{selectedProduct?.price}</span>
               )}
-              {selectedProduct?.stock <= 10 && (
-                <span style={{ fontSize: 11, color: selectedProduct.stock <= 5 ? '#e05555' : '#e07f2a', fontWeight: 500 }}>
-                  {selectedProduct.stock <= 5 ? `⚠️ Only ${selectedProduct.stock} left` : `🔶 ${selectedProduct.stock} left`}
+              {selectedProduct?.stock <= 50 && (
+                <span style={{ fontSize: 11, color: selectedProduct.stock <= 20 ? '#e05555' : '#e07f2a', fontWeight: 500 }}>
+                  {selectedProduct.stock <= 20 ? `⚠️ Only ${selectedProduct.stock} left` : `🔶 ${selectedProduct.stock} left`}
                 </span>
               )}
             </div>
