@@ -397,12 +397,23 @@ export default function App() {
     setBufferSending(true);
     setBufferResult(null);
     try {
+      // Generate full 1080px image for Buffer
+      const { canvasSize, editedCaption } = stateRef.current;
+      const cv = canvasRef.current;
+      const full = document.createElement('canvas');
+      full.width = canvasSize.w;
+      full.height = canvasSize.h;
+      full.getContext('2d').drawImage(cv, 0, 0, canvasSize.w, canvasSize.h);
+      const imageDataUrl = full.toDataURL('image/png');
+
       const res = await fetch('/api/buffer-post', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          caption: stateRef.current.editedCaption || '',
+          caption: editedCaption,
+          imageDataUrl,
           channelIds: selectedChannels,
+          canvasLabel: canvasSize.label,
         }),
       });
       const data = await res.json();

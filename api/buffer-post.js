@@ -1,9 +1,11 @@
+import { put, del } from '@vercel/blob';
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { caption, channelIds } = req.body;
+  const { caption, imageDataUrl, channelIds, canvasLabel } = req.body;
 
   if (!channelIds || channelIds.length === 0) {
     return res.status(400).json({ error: 'At least one channel is required' });
@@ -18,15 +20,46 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Buffer API key not configured' });
   }
 
+  // Map canvas size to Buffer post type
+  const postType = canvasLabel === 'Story 9:16' ? 'story' : 'post';
+
   const headers = {
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${apiKey}`,
   };
 
+  // Upload image to Vercel Blob if provided
+  let imageUrl = null;
+  let blobUrl = null;
+
+  if (imageDataUrl) {
+    try {
+      const base64Data = imageDataUrl.replace(/^data:image\/\w+;base64,/, '');
+      const imageBuffer = Buffer.from(base64Data, 'base64');
+      const filename = `ge-social-${Date.now()}.png`;
+
+      const blob = await put(filename, imageBuffer, {
+        access: 'public',
+        contentType: 'image/png',
+      });
+
+      imageUrl = blob.url;
+      blobUrl = blob.url;
+      console.log('Uploaded to Vercel Blob:', imageUrl);
+    } catch (e) {
+      console.error('Blob upload failed:', e.message);
+      return res.status(500).json({ error: 'Failed to upload image: ' + e.message });
+    }
+  }
+
   const results = [];
 
   for (const channelId of channelIds) {
     try {
+      const assetsBlock = imageUrl
+        ? `assets: { images: [{ url: "${imageUrl}" }] }`
+        : '';
+
       const mutation = `
         mutation CreatePost {
           createPost(input: {
@@ -34,6 +67,7 @@ export default async function handler(req, res) {
             channelId: "${channelId}",
             schedulingType: automatic,
             mode: addToQueue
+            ${assetsBlock}
           }) {
             ... on PostActionSuccess {
               post {
@@ -70,6 +104,19 @@ export default async function handler(req, res) {
     } catch (error) {
       results.push({ channelId, success: false, error: error.message });
     }
+  }
+
+  // Clean up blob after Buffer has received the URL
+  // Give Buffer a moment to fetch it before deleting
+  if (blobUrl) {
+    setTimeout(async () => {
+      try {
+        await del(blobUrl);
+        console.log('Cleaned up blob:', blobUrl);
+      } catch (e) {
+        console.error('Blob cleanup failed:', e.message);
+      }
+    }, 30000); // delete after 30 seconds
   }
 
   const allSuccess = results.every(r => r.success);
