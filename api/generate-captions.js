@@ -76,7 +76,16 @@ Respond with ONLY a JSON object — no markdown, no explanation, no backticks:
 
     const text = data.content.filter(b => b.type === 'text').map(b => b.text).join('');
     const clean = text.replace(/```json|```/g, '').trim();
-    const parsed = JSON.parse(clean);
+    
+    // Try direct parse first, then extract JSON object if that fails
+    let parsed;
+    try {
+      parsed = JSON.parse(clean);
+    } catch(parseErr) {
+      const match = clean.match(/\{[\s\S]*\}/);
+      if (!match) throw new Error('Could not find JSON in response');
+      parsed = JSON.parse(match[0]);
+    }
 
     return res.status(200).json(parsed);
   } catch (error) {
