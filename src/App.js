@@ -592,7 +592,7 @@ export default function App() {
     selBar: { background: '#f0f5e8', border: '1px solid #d4e8b8', borderRadius: 8, padding: '10px 14px', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, flexWrap: 'wrap' },
     tag: (color) => ({ fontSize: 11, padding: '3px 8px', borderRadius: 10, background: color === 'pink' ? '#fce8f3' : '#e8f5d4', color: color === 'pink' ? BRAND.pink : BRAND.darkGreen, fontWeight: 500 }),
     captionCard: (sel) => ({ border: `${sel ? 2 : 1}px solid ${sel ? BRAND.green : '#e0e8d8'}`, borderRadius: 12, padding: '12px 14px', marginBottom: 8, cursor: 'pointer', fontSize: 14, lineHeight: 1.6, color: '#1a1a1a', background: '#fff' }),
-    textarea: { width: '100%', minHeight: 90, padding: '10px 12px', fontSize: 14, border: '1px solid #e0e8d8', borderRadius: 8, fontFamily: BRAND.font, lineHeight: 1.6, resize: 'vertical', color: '#1a1a1a' },
+    textarea: { width: '100%', minHeight: 90, padding: '10px 12px', fontSize: 14, border: '1px solid #e0e8d8', borderRadius: 8, fontFamily: BRAND.font, lineHeight: 1.6, resize: 'vertical', color: '#1a1a1a', boxSizing: 'border-box' },
     controlSection: { border: '1px solid #e0e8d8', borderRadius: 12, padding: 14, background: '#fff', marginBottom: 10 },
     canvasWrap: { border: '1px solid #e0e8d8', borderRadius: 12, overflow: 'hidden', background: '#1a1a1a', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 12, marginBottom: 12 },
     uploadLabel: { display: 'block', padding: '8px 14px', border: '1px dashed #ccc', borderRadius: 8, fontSize: 13, cursor: 'pointer', color: '#888', textAlign: 'center', width: '100%', boxSizing: 'border-box', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
