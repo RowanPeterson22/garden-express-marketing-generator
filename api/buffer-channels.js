@@ -76,12 +76,14 @@ export default async function handler(req, res) {
       ? process.env.BUFFER_CHANNEL_IDS_VB.split(',').map(id => id.trim())
       : null;
 
-    const defaultBrand = process.env.BUFFER_DEFAULT_BRAND || 'garden_express';
+    const defaultIds = process.env.BUFFER_DEFAULT_CHANNEL_IDS
+      ? process.env.BUFFER_DEFAULT_CHANNEL_IDS.split(',').map(id => id.trim())
+      : null;
 
     const channels = (channelsData.data?.channels || [])
       .filter(ch => !ch.isLocked)
       .filter(ch => !allowedIds || allowedIds.includes(ch.id))
-      .filter(ch => ch.name.toLowerCase().includes(defaultBrand.toLowerCase()) || (ch.displayName || '').toLowerCase().includes(defaultBrand.toLowerCase()))
+      .filter(ch => !defaultIds || defaultIds.includes(ch.id))
       .map(ch => ({
         id: ch.id,
         name: ch.displayName || ch.name,
