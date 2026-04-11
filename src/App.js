@@ -110,6 +110,7 @@ export default function App() {
   const [selectedCaption, setSelectedCaption] = useState('');
   const [editedCaption, setEditedCaption] = useState('');
   const [generating, setGenerating] = useState(false);
+  const [writeOwn, setWriteOwn] = useState(false);
   const [genError, setGenError] = useState('');
   const [canvasSize, setCanvasSize] = useState({ w: 1080, h: 1080, label: 'Feed 1:1' });
   const [barStyle, setBarStyle] = useState('none');
@@ -303,6 +304,7 @@ export default function App() {
     setCaptions([]);
     setSelectedCaption('');
     setEditedCaption('');
+    setWriteOwn(false);
     try {
       const res = await fetch('/api/generate-captions', {
         method: 'POST',
@@ -380,6 +382,7 @@ export default function App() {
     setSelectedCaption('');
     setEditedCaption('');
     setGenError('');
+    setWriteOwn(false);
     setCanvasSize({ w: 1080, h: 1080, label: 'Feed 1:1' });
     setBarStyle('none');
     setOverlayText('');
@@ -693,7 +696,7 @@ export default function App() {
               <button style={s.btn('primary')} onClick={generateCaptions} disabled={generating}>
                 {generating ? 'Generating...' : captions.length ? 'Regenerate' : 'Generate captions'}
               </button>
-              <button style={s.btn('default')} onClick={() => { setSelectedCaption(' '); setEditedCaption(''); setGenError(''); setCaptions([]); }}>Write my own</button>
+              <button style={s.btn('default')} onClick={() => { setWriteOwn(true); setSelectedCaption(''); setEditedCaption(''); setGenError(''); setCaptions([]); }}>Write my own</button>
               {genError && <span style={{ fontSize: 13, color: '#c0392b' }}>Caption generation is temporarily unavailable — please contact Rowan.</span>}
             </div>
             {generating && <div style={{ textAlign: 'center', padding: 24, color: '#888', fontSize: 14 }}>Writing captions in the Garden Express voice...</div>}
@@ -703,7 +706,7 @@ export default function App() {
                 {captions.map((c, i) => <div key={i} style={s.captionCard(selectedCaption === c)} onClick={() => { setSelectedCaption(c); setEditedCaption(c); }}>{c}</div>)}
               </>
             )}
-            {selectedCaption && (
+            {(selectedCaption || writeOwn) && (
               <>
                 <div style={{ border: '1px solid #c8dfc0', borderRadius: 12, padding: '14px', background: '#f4faf0', marginTop: 4 }}>
                   <span style={{ ...s.sectionLabel, marginTop: 0, marginBottom: 8, display: 'block', color: '#2d7a4f' }}>Edit caption</span>
@@ -758,7 +761,7 @@ export default function App() {
                 </div>
               </>
             )}
-            {!selectedCaption && (
+            {!selectedCaption && !writeOwn && (
               <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
                 <button style={s.btn('default')} onClick={() => setStep(1)}>Back</button>
                 <button style={s.btn('default')} onClick={() => { setEditedCaption(''); setStep(3); }}>Skip — compose image only</button>
