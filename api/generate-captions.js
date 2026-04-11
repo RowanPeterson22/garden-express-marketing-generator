@@ -44,7 +44,7 @@ Description: ${description || ''}
 Rules:
 - Each caption is 2-4 sentences
 - ${includeHashtags !== false ? 'Include 4-6 relevant hashtags at the end' : 'Do not include any hashtags'}
-- End with a gentle call to action
+- End with a gentle call to action directing customers to shop online — Garden Express is online only, never mention visiting in-store
 - Reflect Australian gardening seasons and lifestyle where relevant
 - Never use exclamation marks excessively — one per caption maximum
 - Never use the word "cheap"
