@@ -567,7 +567,7 @@ export default function App() {
     textarea: { width: '100%', minHeight: 90, padding: '10px 12px', fontSize: 14, border: '1px solid #e0e8d8', borderRadius: 8, fontFamily: BRAND.font, lineHeight: 1.6, resize: 'vertical', color: '#1a1a1a' },
     controlSection: { border: '1px solid #e0e8d8', borderRadius: 12, padding: 14, background: '#fff', marginBottom: 10 },
     canvasWrap: { border: '1px solid #e0e8d8', borderRadius: 12, overflow: 'hidden', background: '#1a1a1a', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 12, marginBottom: 12 },
-    uploadLabel: { display: 'block', padding: '8px 14px', border: '1px dashed #ccc', borderRadius: 8, fontSize: 13, cursor: 'pointer', color: '#888', textAlign: 'center', width: '100%' },
+    uploadLabel: { display: 'block', padding: '8px 14px', border: '1px dashed #ccc', borderRadius: 8, fontSize: 13, cursor: 'pointer', color: '#888', textAlign: 'center', width: '100%', boxSizing: 'border-box', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
     row2: { display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', marginTop: 8 },
     infoBox: { background: '#f0f7e8', border: '1px solid #c8e89c', borderRadius: 8, padding: '11px 14px', fontSize: 13, color: '#3a6010', lineHeight: 1.6, marginBottom: 16 },
     badgeGrid: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6, marginTop: 6 },
@@ -739,11 +739,14 @@ export default function App() {
                 <span style={{ ...s.sectionLabel, marginTop: 0 }}>Preview</span>
                 <div style={s.canvasWrap}><canvas ref={canvasRef} style={{ display: 'block', borderRadius: 4, maxWidth: '100%', maxHeight: 460 }} /></div>
                 {editedCaption && (
-                  <div style={{ background: '#f7f9f5', border: '1px solid #e0e8d8', borderRadius: 8, padding: '10px 12px', fontSize: 13, color: '#555', lineHeight: 1.6, marginBottom: 12 }}>
-                    <strong>Caption:</strong> {editedCaption}
+                  <div style={{ background: '#f7f9f5', border: '1px solid #e0e8d8', borderRadius: 8, padding: '10px 12px', fontSize: 13, color: '#555', lineHeight: 1.6, marginBottom: 8 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
+                      <div><strong>Caption:</strong> {editedCaption}</div>
+                      <button onClick={() => { navigator.clipboard.writeText(editedCaption); }} style={{ flexShrink: 0, fontSize: 11, padding: '3px 10px', border: `1px solid ${BRAND.green}`, borderRadius: 6, background: '#fff', color: BRAND.green, cursor: 'pointer', fontFamily: BRAND.font, whiteSpace: 'nowrap' }}>Copy</button>
+                    </div>
                   </div>
                 )}
-                <div style={{ display: 'flex', gap: 8 }}>
+                <div style={{ display: 'flex', gap: 8, marginBottom: 4 }}>
                   <button style={s.btn('default')} onClick={() => setStep(2)}>Back</button>
                   <button style={s.btn('primary')} onClick={downloadImage}>Download image</button>
                 </div>
