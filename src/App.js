@@ -778,6 +778,11 @@ export default function App() {
                   <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                     {sizes.map(sz => <div key={sz.label} style={s.pill(canvasSize.label === sz.label)} onClick={() => { setCanvasSize(sz); }}>{sz.label}</div>)}
                   </div>
+                  <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 5 }}>
+                    <div style={{ fontSize: 11, color: '#888', lineHeight: 1.4 }}>📘 <strong>Feed 1:1</strong> — Classic square format, ideal for Facebook</div>
+                    <div style={{ fontSize: 11, color: '#888', lineHeight: 1.4 }}>📸 <strong>Portrait 4:5</strong> — Recommended for Instagram feed, also great on Facebook</div>
+                    <div style={{ fontSize: 11, color: '#888', lineHeight: 1.4 }}>🎬 <strong>Story 9:16</strong> — Full-screen vertical, the preferred format for Stories on both platforms</div>
+                  </div>
                 </div>
                 <div style={s.controlSection}>
                   <span style={{ ...s.sectionLabel, marginTop: 0 }}>Product image</span>
