@@ -320,6 +320,8 @@ export default function App() {
       if (data.error) throw new Error(data.error);
       setCaptions(data.captions || []);
     } catch (e) {
+      console.error('Caption generation error:', e.message);
+      alert('Caption error: ' + e.message);
       setGenError('error');
     }
     setGenerating(false);
