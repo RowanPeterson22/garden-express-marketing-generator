@@ -110,6 +110,7 @@ export default function App() {
   const [useEmojis, setUseEmojis] = useState(true);
   const [includeHashtags, setIncludeHashtags] = useState(true);
   const [includeStock, setIncludeStock] = useState(true);
+  const [regeneratingIndex, setRegeneratingIndex] = useState(null);
   const [captions, setCaptions] = useState([]);
   const [selectedCaption, setSelectedCaption] = useState('');
   const [editedCaption, setEditedCaption] = useState('');
@@ -410,8 +411,6 @@ export default function App() {
     setBufferResult(null);
     setCaptionCopied(false);
   };
-
-  const [regeneratingIndex, setRegeneratingIndex] = useState(null);
 
   const regenerateSingleCaption = async (index) => {
     setRegeneratingIndex(index);
