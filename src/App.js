@@ -437,7 +437,8 @@ export default function App() {
     }
     setRegeneratingIndex(null);
   };
-    if (bufferChannelsLoaded) return;
+
+  const loadBufferChannels = async () => {
     try {
       const res = await fetch('/api/buffer-channels');
       const data = await res.json();
