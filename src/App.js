@@ -101,6 +101,7 @@ export default function App() {
   const [bufferSending, setBufferSending] = useState(false);
   const [bufferResult, setBufferResult] = useState(null);
   const [bufferExpiry, setBufferExpiry] = useState(null);
+  const [captionCopied, setCaptionCopied] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -740,15 +741,17 @@ export default function App() {
                 <div style={s.canvasWrap}><canvas ref={canvasRef} style={{ display: 'block', borderRadius: 4, maxWidth: '100%', maxHeight: 460 }} /></div>
                 {editedCaption && (
                   <div style={{ background: '#f7f9f5', border: '1px solid #e0e8d8', borderRadius: 8, padding: '10px 12px', fontSize: 13, color: '#555', lineHeight: 1.6, marginBottom: 8 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
-                      <div><strong>Caption:</strong> {editedCaption}</div>
-                      <button onClick={() => { navigator.clipboard.writeText(editedCaption); }} style={{ flexShrink: 0, fontSize: 11, padding: '3px 10px', border: `1px solid ${BRAND.green}`, borderRadius: 6, background: '#fff', color: BRAND.green, cursor: 'pointer', fontFamily: BRAND.font, whiteSpace: 'nowrap' }}>Copy</button>
-                    </div>
+                    <strong>Caption:</strong> {editedCaption}
                   </div>
                 )}
-                <div style={{ display: 'flex', gap: 8, marginBottom: 4 }}>
+                <div style={{ display: 'flex', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
                   <button style={s.btn('default')} onClick={() => setStep(2)}>Back</button>
                   <button style={s.btn('primary')} onClick={downloadImage}>Download image</button>
+                  {editedCaption && (
+                    <button onClick={() => { navigator.clipboard.writeText(editedCaption); setCaptionCopied(true); setTimeout(() => setCaptionCopied(false), 3000); }} style={{ ...s.btn('default'), fontStyle: captionCopied ? 'italic' : 'normal', color: captionCopied ? BRAND.green : '#666', borderColor: captionCopied ? BRAND.green : '#ccc' }}>
+                      {captionCopied ? 'Caption copied!' : 'Copy caption'}
+                    </button>
+                  )}
                 </div>
 
                 {/* Buffer Integration */}
