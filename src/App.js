@@ -396,7 +396,6 @@ export default function App() {
     setBufferSending(true);
     setBufferResult(null);
     try {
-      const dataUrl = canvasRef.current.toDataURL('image/png');
       const res = await fetch('/api/buffer-post', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
