@@ -658,11 +658,9 @@ export default function App() {
                   ) : (
                     <div style={{ fontSize: 12, color: '#666' }}>{p.price}</div>
                   )}
-                  {p.stock <= 50 && (
-                    <div style={{ fontSize: 11, marginTop: 3, fontWeight: 700, color: p.stock < 10 ? '#e05555' : p.stock <= 30 ? '#c47f00' : '#e07f2a' }}>
-                      {p.stock < 10 ? `⛔ Do not promote — ${p.stock} left` : p.stock <= 30 ? `⚠️ Only ${p.stock} left` : `🔶 Low stock — ${p.stock} left`}
-                    </div>
-                  )}
+                  <div style={{ fontSize: 11, marginTop: 3, fontWeight: 700, color: p.stock < 10 ? '#e05555' : p.stock <= 30 ? '#c47f00' : p.stock <= 50 ? '#e07f2a' : '#2d7a4f' }}>
+                    {p.stock < 10 ? `⛔ Do not promote — ${p.stock} left` : p.stock <= 30 ? `⚠️ Only ${p.stock} left` : p.stock <= 50 ? `🔶 Low stock — ${p.stock} left` : `✅ In stock — ${p.stock} available`}
+                  </div>
                 </div>
               ))}
             </div>
@@ -683,9 +681,9 @@ export default function App() {
               ) : (
                 <span style={s.tag('pink')}>{selectedProduct?.price}</span>
               )}
-              {selectedProduct?.stock <= 50 && (
-                <span style={{ fontSize: 11, fontWeight: 700, color: selectedProduct.stock < 10 ? '#e05555' : selectedProduct.stock <= 30 ? '#c47f00' : '#e07f2a' }}>
-                  {selectedProduct.stock < 10 ? `⛔ Do not promote — ${selectedProduct.stock} left` : selectedProduct.stock <= 30 ? `⚠️ Only ${selectedProduct.stock} left` : `🔶 ${selectedProduct.stock} left`}
+              {selectedProduct?.stock !== undefined && (
+                <span style={{ fontSize: 11, fontWeight: 700, color: selectedProduct.stock < 10 ? '#e05555' : selectedProduct.stock <= 30 ? '#c47f00' : selectedProduct.stock <= 50 ? '#e07f2a' : '#2d7a4f' }}>
+                  {selectedProduct.stock < 10 ? `⛔ Do not promote — ${selectedProduct.stock} left` : selectedProduct.stock <= 30 ? `⚠️ Only ${selectedProduct.stock} left` : selectedProduct.stock <= 50 ? `🔶 ${selectedProduct.stock} left` : `✅ ${selectedProduct.stock} available`}
                 </span>
               )}
             </div>
