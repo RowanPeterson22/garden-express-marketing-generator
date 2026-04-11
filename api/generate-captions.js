@@ -3,7 +3,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { product, price, wasPrice, description, postType, includePrices, stock, useEmojis, includeHashtags } = req.body;
+  const { product, price, wasPrice, description, postType, includePrices, stock, useEmojis, includeHashtags, includeStock } = req.body;
 
   if (!product) {
     return res.status(400).json({ error: 'Product is required' });
@@ -20,7 +20,7 @@ export default async function handler(req, res) {
     ? `Price: ${price || ''}${wasPrice ? `\nWas: ${wasPrice} (this is a special/sale price — mention the saving)` : ''}`
     : `Price: Do not mention the price in the caption.`;
 
-  const stockInfo = stock !== undefined
+  const stockInfo = includeStock !== false && stock !== undefined
     ? stock < 10
       ? `Stock: Only ${stock} remaining — do NOT promote this product. Do not write captions encouraging purchase.`
       : stock <= 30
@@ -28,7 +28,7 @@ export default async function handler(req, res) {
         : stock <= 50
           ? `Stock: Low stock (${stock} left) — you may subtly hint at availability if appropriate`
           : `Stock: Good availability — no need to mention stock`
-    : '';
+    : `Stock: Do not mention stock levels or availability in the caption.`;
 
   const prompt = `You are a social media copywriter for Garden Express Australia, a premium home and garden nursery.
 
