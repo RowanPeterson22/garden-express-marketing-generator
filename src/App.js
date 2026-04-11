@@ -708,9 +708,11 @@ export default function App() {
                   <span style={{ ...s.sectionLabel, marginTop: 0, marginBottom: 8, display: 'block', color: '#2d7a4f' }}>Edit caption</span>
                   <textarea
                     id="captionTextarea"
-                    style={{ ...s.textarea, background: '#fff' }}
+                    style={{ ...s.textarea, background: '#fff', resize: 'none', overflow: 'hidden' }}
                     value={editedCaption}
-                    onChange={e => setEditedCaption(e.target.value)}
+                    onChange={e => { setEditedCaption(e.target.value); e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px'; }}
+                    onInput={e => { e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px'; }}
+                    ref={el => { if (el) { el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; } }}
                   />
                   <div style={{ marginTop: 8 }}>
                     {[
