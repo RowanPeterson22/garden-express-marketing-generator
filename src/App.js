@@ -734,6 +734,7 @@ export default function App() {
                   />
                   <div style={{ marginTop: 8 }}>
                     {[
+                      { label: 'Smilies', first: '😊', emojis: ['😊','😍','🥰','😄','😁','🤩','😎','🥳','😇','🙌','👏','💪','🫶','❤️','💚','💛','🧡','💜','🤍','✨'] },
                       { label: 'Plants', first: '🌿', emojis: ['🌿','🌱','🍃','🌾','🌵','🎋','🎍','🪴','🌲','🌳','🌴'] },
                       { label: 'Flowers', first: '🌸', emojis: ['🌸','🌺','🌻','🌹','🌷','💐','🪷','🏵️'] },
                       { label: 'Garden & Nature', first: '☀️', emojis: ['🌍','☀️','🌤️','🌧️','💧','🌈','🍂','🍁','❄️','🌙'] },
