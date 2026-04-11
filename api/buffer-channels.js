@@ -72,8 +72,8 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: channelsData.errors[0]?.message || 'Failed to fetch channels' });
     }
 
-    const allowedIds = process.env.BUFFER_CHANNEL_IDS
-      ? process.env.BUFFER_CHANNEL_IDS.split(',').map(id => id.trim())
+    const allowedIds = process.env.BUFFER_CHANNEL_IDS_VB
+      ? process.env.BUFFER_CHANNEL_IDS_VB.split(',').map(id => id.trim())
       : null;
 
     const channels = (channelsData.data?.channels || [])

@@ -15,7 +15,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'A caption or image is required to post to Buffer' });
   }
 
-  const apiKey = process.env.BUFFER_API_KEY_VB || process.env.BUFFER_API_KEY;
+  const apiKey = process.env.BUFFER_API_KEY;
   if (!apiKey) {
     return res.status(500).json({ error: 'Buffer API key not configured' });
   }
