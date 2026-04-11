@@ -321,7 +321,7 @@ export default function App() {
         <div style={{ fontSize: 14, color: '#888', marginBottom: 24 }}>Select a brand to load its social channels and settings.</div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           {VB_BRANDS.map(brand => (
-            <div key={brand.id} onClick={() => { setActiveBrand(brand); setModule('social'); }}
+            <div key={brand.id} onClick={() => { setActiveBrand(brand); setModule('social'); setBufferChannels([]); setBufferChannelsLoaded(false); setSelectedChannels([]); setBufferResult(null); }}
               style={{ background: '#fff', border: '1px solid #e0e8d8', borderRadius: 16, padding: '20px 18px', cursor: 'pointer', transition: 'border-color 0.15s' }}
               onMouseEnter={e => e.currentTarget.style.borderColor = BRAND.green}
               onMouseLeave={e => e.currentTarget.style.borderColor = '#e0e8d8'}>
