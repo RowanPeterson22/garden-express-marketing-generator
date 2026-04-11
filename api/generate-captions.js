@@ -3,7 +3,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { product, price, wasPrice, description, postType, includePrices, stock } = req.body;
+  const { product, price, wasPrice, description, postType, includePrices, stock, useEmojis } = req.body;
 
   if (!product) {
     return res.status(400).json({ error: 'Product is required' });
@@ -48,7 +48,7 @@ Rules:
 - Reflect Australian gardening seasons and lifestyle where relevant
 - Never use exclamation marks excessively — one per caption maximum
 - Never use the word "cheap"
-- Always use 2-3 emojis per caption, placed naturally inline within the text — not just at the start or end. Choose plant 🌿, garden 🌱, flower 🌸, weather ☀️, food 🍓, or lifestyle emojis that match the product. For elegant or premium products use more refined emojis (🌿🌸🍃) rather than playful ones.
+- ${useEmojis !== false ? 'Always use 2-3 emojis per caption, placed naturally inline within the text — not just at the start or end. Choose plant 🌿, garden 🌱, flower 🌸, weather ☀️, food 🍓, or lifestyle emojis that match the product. For elegant or premium products use more refined emojis (🌿🌸🍃) rather than playful ones.' : 'Do not use any emojis — plain text only.'}
 
 Respond with ONLY a JSON object — no markdown, no explanation, no backticks:
 {"captions":["caption one","caption two","caption three"]}`;

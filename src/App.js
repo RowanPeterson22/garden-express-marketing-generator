@@ -107,6 +107,7 @@ export default function App() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [postType, setPostType] = useState('product');
   const [includePrices, setIncludePrices] = useState(true);
+  const [useEmojis, setUseEmojis] = useState(true);
   const [captions, setCaptions] = useState([]);
   const [selectedCaption, setSelectedCaption] = useState('');
   const [editedCaption, setEditedCaption] = useState('');
@@ -310,7 +311,7 @@ export default function App() {
       const res = await fetch('/api/generate-captions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ product: selectedProduct.name, price: selectedProduct.price, wasPrice: selectedProduct.wasPrice || null, stock: selectedProduct.stock, description: selectedProduct.desc, postType, includePrices }),
+        body: JSON.stringify({ product: selectedProduct.name, price: selectedProduct.price, wasPrice: selectedProduct.wasPrice || null, stock: selectedProduct.stock, description: selectedProduct.desc, postType, includePrices, useEmojis }),
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
@@ -380,6 +381,7 @@ export default function App() {
     setSelectedCategory('All');
     setPostType('product');
     setIncludePrices(true);
+    setUseEmojis(true);
     setCaptions([]);
     setSelectedCaption('');
     setEditedCaption('');
@@ -701,10 +703,16 @@ export default function App() {
                 </div>
               ))}
             </div>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#555', marginBottom: 14, cursor: 'pointer', userSelect: 'none' }}>
-              <input type="checkbox" checked={includePrices} onChange={e => setIncludePrices(e.target.checked)} style={{ width: 16, height: 16, accentColor: BRAND.green, cursor: 'pointer' }} />
-              Include price in caption
-            </label>
+            <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', marginBottom: 14 }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#555', cursor: 'pointer', userSelect: 'none' }}>
+                <input type="checkbox" checked={includePrices} onChange={e => setIncludePrices(e.target.checked)} style={{ width: 16, height: 16, accentColor: BRAND.green, cursor: 'pointer' }} />
+                Include price
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#555', cursor: 'pointer', userSelect: 'none' }}>
+                <input type="checkbox" checked={useEmojis} onChange={e => setUseEmojis(e.target.checked)} style={{ width: 16, height: 16, accentColor: BRAND.green, cursor: 'pointer' }} />
+                Use emojis
+              </label>
+            </div>
             <div style={s.infoBox}>Click <strong>Generate caption ideas</strong> — we'll write 3 options using the Garden Express tone of voice.</div>
             <div style={{ display: 'flex', gap: 8, marginBottom: 16, alignItems: 'center', flexWrap: 'wrap' }}>
               <button style={s.btn('primary')} onClick={generateCaptions} disabled={generating}>
