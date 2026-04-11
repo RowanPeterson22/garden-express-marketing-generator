@@ -76,14 +76,13 @@ export default async function handler(req, res) {
       ? process.env.BUFFER_CHANNEL_IDS_VB.split(',').map(id => id.trim())
       : null;
 
-    const defaultIds = process.env.BUFFER_DEFAULT_CHANNEL_IDS
-      ? process.env.BUFFER_DEFAULT_CHANNEL_IDS.split(',').map(id => id.trim())
-      : null;
+    // Default to GE channels only until multi-brand switcher is built
+    const GE_CHANNEL_IDS = ['69d868c6031bfa423cea3db2', '69d869a3031bfa423cea42bf'];
 
     const channels = (channelsData.data?.channels || [])
       .filter(ch => !ch.isLocked)
       .filter(ch => !allowedIds || allowedIds.includes(ch.id))
-      .filter(ch => !defaultIds || defaultIds.includes(ch.id))
+      .filter(ch => GE_CHANNEL_IDS.includes(ch.id))
       .map(ch => ({
         id: ch.id,
         name: ch.displayName || ch.name,
