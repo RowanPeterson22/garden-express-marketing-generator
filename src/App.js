@@ -411,7 +411,32 @@ export default function App() {
     setCaptionCopied(false);
   };
 
-  const loadBufferChannels = async () => {
+  const [regeneratingIndex, setRegeneratingIndex] = useState(null);
+
+  const regenerateSingleCaption = async (index) => {
+    setRegeneratingIndex(index);
+    const { includePrices: ip, useEmojis: ue, includeHashtags: ih, includeStock: is, selectedProduct: sp } = stateRef.current;
+    try {
+      const res = await fetch('/api/generate-captions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ product: sp.name, price: sp.price, wasPrice: sp.wasPrice || null, stock: sp.stock, description: sp.desc, postType, includePrices: ip, useEmojis: ue, includeHashtags: ih, includeStock: is }),
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      const newCaptions = data.captions || [];
+      if (newCaptions.length > 0) {
+        setCaptions(prev => prev.map((c, i) => i === index ? newCaptions[0] : c));
+        if (selectedCaption === captions[index]) {
+          setSelectedCaption(newCaptions[0]);
+          setEditedCaption(newCaptions[0]);
+        }
+      }
+    } catch (e) {
+      console.error('Regenerate error:', e.message);
+    }
+    setRegeneratingIndex(null);
+  };
     if (bufferChannelsLoaded) return;
     try {
       const res = await fetch('/api/buffer-channels');
@@ -740,7 +765,19 @@ export default function App() {
             {captions.length > 0 && (
               <>
                 <span style={s.sectionLabel}>Choose a caption</span>
-                {captions.map((c, i) => <div key={i} style={s.captionCard(selectedCaption === c)} onClick={() => { setSelectedCaption(c); setEditedCaption(c); }}>{c}</div>)}
+                {captions.map((c, i) => (
+                  <div key={i} style={{ ...s.captionCard(selectedCaption === c), position: 'relative' }} onClick={() => { setSelectedCaption(c); setEditedCaption(c); }}>
+                    <div style={{ paddingRight: 32 }}>{c}</div>
+                    <button
+                      onClick={e => { e.stopPropagation(); regenerateSingleCaption(i); }}
+                      disabled={regeneratingIndex !== null}
+                      title="Regenerate this caption"
+                      style={{ position: 'absolute', top: 8, right: 8, background: 'none', border: 'none', cursor: regeneratingIndex === i ? 'wait' : 'pointer', fontSize: 15, opacity: regeneratingIndex === i ? 0.4 : 0.5, padding: 2, lineHeight: 1 }}
+                    >
+                      {regeneratingIndex === i ? '⏳' : '↻'}
+                    </button>
+                  </div>
+                ))}
               </>
             )}
             {(selectedCaption || writeOwn) && (
