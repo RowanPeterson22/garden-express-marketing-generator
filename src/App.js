@@ -370,6 +370,33 @@ export default function App() {
   };
 
 
+  const startOver = () => {
+    setStep(1);
+    setSelectedProduct(null);
+    setSearchQuery('');
+    setSelectedCategory('All');
+    setPostType('product');
+    setCaptions([]);
+    setSelectedCaption('');
+    setEditedCaption('');
+    setGenError('');
+    setCanvasSize({ w: 1080, h: 1080, label: 'Feed 1:1' });
+    setBarStyle('none');
+    setOverlayText('');
+    setOverlayStyle('banner');
+    setOverlayPos('top');
+    setOverlayBg('#70b738');
+    setOverlayFg('#ffffff');
+    setSelectedBadge('');
+    setBadgeColor('green');
+    setLogoChoice('none');
+    setRawImgSrc(null);
+    setCroppedImgs({ '1:1': null, '4:5': null, '9:16': null });
+    setSelectedChannels([]);
+    setBufferResult(null);
+    setCaptionCopied(false);
+  };
+
   const loadBufferChannels = async () => {
     if (bufferChannelsLoaded) return;
     try {
@@ -586,7 +613,10 @@ export default function App() {
         </div>
         <span style={{ fontSize: 16, fontWeight: 600, color: '#1a1a1a' }}>Garden Express</span>
         <span style={{ fontSize: 13, color: '#888', marginLeft: 4 }}>Social post creator</span>
-        <div style={{ marginLeft: 'auto', fontSize: 13, color: '#666', cursor: 'pointer', padding: '5px 12px', border: '1px solid #e0e8d8', borderRadius: 8, background: '#f7f9f5' }} onClick={() => { setModule(null); setStep(1); setSelectedProduct(null); }}>← All tools</div>
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center' }}>
+          {step > 1 && <div style={{ fontSize: 13, color: '#888', cursor: 'pointer', padding: '5px 12px', border: '1px solid #e0e8d8', borderRadius: 8, background: '#f7f9f5' }} onClick={startOver}>Start over</div>}
+          <div style={{ fontSize: 13, color: '#666', cursor: 'pointer', padding: '5px 12px', border: '1px solid #e0e8d8', borderRadius: 8, background: '#f7f9f5' }} onClick={() => { setModule(null); setStep(1); setSelectedProduct(null); }}>← All tools</div>
+        </div>
       </div>
       <div style={s.main}>
         <div style={s.stepBar}>
