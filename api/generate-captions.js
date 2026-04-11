@@ -3,7 +3,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { product, price, wasPrice, description, postType, includePrices, stock, useEmojis } = req.body;
+  const { product, price, wasPrice, description, postType, includePrices, stock, useEmojis, includeHashtags } = req.body;
 
   if (!product) {
     return res.status(400).json({ error: 'Product is required' });
@@ -43,7 +43,7 @@ Description: ${description || ''}
 
 Rules:
 - Each caption is 2-4 sentences
-- Include 4-6 relevant hashtags at the end
+- ${includeHashtags !== false ? 'Include 4-6 relevant hashtags at the end' : 'Do not include any hashtags'}
 - End with a gentle call to action
 - Reflect Australian gardening seasons and lifestyle where relevant
 - Never use exclamation marks excessively — one per caption maximum

@@ -108,6 +108,7 @@ export default function App() {
   const [postType, setPostType] = useState('product');
   const [includePrices, setIncludePrices] = useState(true);
   const [useEmojis, setUseEmojis] = useState(true);
+  const [includeHashtags, setIncludeHashtags] = useState(true);
   const [captions, setCaptions] = useState([]);
   const [selectedCaption, setSelectedCaption] = useState('');
   const [editedCaption, setEditedCaption] = useState('');
@@ -137,7 +138,7 @@ export default function App() {
   const formatKey = canvasSize.w === 1080 && canvasSize.h === 1080 ? '1:1' : canvasSize.h === 1350 ? '4:5' : '9:16';
   const productImg = croppedImgs[formatKey];
 
-  stateRef.current = { canvasSize, barStyle, overlayText, overlayStyle, overlayPos, overlayBg, overlayFg, selectedBadge, badgeColor, logoChoice, productImg, selectedProduct, croppedImgs, formatKey, editedCaption, includePrices, useEmojis };
+  stateRef.current = { canvasSize, barStyle, overlayText, overlayStyle, overlayPos, overlayBg, overlayFg, selectedBadge, badgeColor, logoChoice, productImg, selectedProduct, croppedImgs, formatKey, editedCaption, includePrices, useEmojis, includeHashtags };
 
   const drawCanvas = useCallback(() => {
     const { canvasSize, barStyle, overlayText, overlayStyle, overlayPos, overlayBg, overlayFg, selectedBadge, badgeColor, logoChoice, selectedProduct, croppedImgs, formatKey } = stateRef.current;
@@ -307,12 +308,12 @@ export default function App() {
     setSelectedCaption('');
     setEditedCaption('');
     setWriteOwn(false);
-    const { includePrices: ip, useEmojis: ue, selectedProduct: sp } = stateRef.current;
+    const { includePrices: ip, useEmojis: ue, includeHashtags: ih, selectedProduct: sp } = stateRef.current;
     try {
       const res = await fetch('/api/generate-captions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ product: sp.name, price: sp.price, wasPrice: sp.wasPrice || null, stock: sp.stock, description: sp.desc, postType, includePrices: ip, useEmojis: ue }),
+        body: JSON.stringify({ product: sp.name, price: sp.price, wasPrice: sp.wasPrice || null, stock: sp.stock, description: sp.desc, postType, includePrices: ip, useEmojis: ue, includeHashtags: ih }),
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
@@ -383,6 +384,7 @@ export default function App() {
     setPostType('product');
     setIncludePrices(true);
     setUseEmojis(true);
+    setIncludeHashtags(true);
     setCaptions([]);
     setSelectedCaption('');
     setEditedCaption('');
@@ -712,6 +714,10 @@ export default function App() {
               <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#555', cursor: 'pointer', userSelect: 'none' }}>
                 <input type="checkbox" checked={useEmojis} onChange={e => setUseEmojis(e.target.checked)} style={{ width: 16, height: 16, accentColor: BRAND.green, cursor: 'pointer' }} />
                 Use emojis
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#555', cursor: 'pointer', userSelect: 'none' }}>
+                <input type="checkbox" checked={includeHashtags} onChange={e => setIncludeHashtags(e.target.checked)} style={{ width: 16, height: 16, accentColor: BRAND.green, cursor: 'pointer' }} />
+                Include hashtags
               </label>
             </div>
             <div style={s.infoBox}>Click <strong>Generate caption ideas</strong> — we'll write 3 options using the Garden Express tone of voice.</div>
