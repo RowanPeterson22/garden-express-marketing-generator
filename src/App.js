@@ -418,7 +418,6 @@ export default function App() {
         }),
       });
       const data = await res.json();
-      alert('Buffer response: ' + JSON.stringify(data));
       if (data.success) {
         setBufferResult({ success: true, message: 'Added to Buffer queue ✓' });
       } else {
