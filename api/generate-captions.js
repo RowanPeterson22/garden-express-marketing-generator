@@ -21,11 +21,13 @@ export default async function handler(req, res) {
     : `Price: Do not mention the price in the caption.`;
 
   const stockInfo = stock !== undefined
-    ? stock <= 20
-      ? `Stock: Only ${stock} remaining — mention urgency naturally (e.g. "limited stock", "don't miss out", "selling fast")`
-      : stock <= 50
-        ? `Stock: Low stock (${stock} left) — you may subtly hint at availability if appropriate`
-        : `Stock: Good availability — no need to mention stock`
+    ? stock < 10
+      ? `Stock: Only ${stock} remaining — do NOT promote this product. Do not write captions encouraging purchase.`
+      : stock <= 20
+        ? `Stock: Only ${stock} remaining — mention urgency naturally (e.g. "limited stock", "don't miss out", "selling fast")`
+        : stock <= 50
+          ? `Stock: Low stock (${stock} left) — you may subtly hint at availability if appropriate`
+          : `Stock: Good availability — no need to mention stock`
     : '';
 
   const prompt = `You are a social media copywriter for Garden Express Australia, a premium home and garden nursery.
