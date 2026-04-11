@@ -694,9 +694,9 @@ export default function App() {
             <div style={s.infoBox}>Click <strong>Generate captions</strong> — we'll write 3 options using the Garden Express tone of voice.</div>
             <div style={{ display: 'flex', gap: 8, marginBottom: 16, alignItems: 'center', flexWrap: 'wrap' }}>
               <button style={s.btn('primary')} onClick={generateCaptions} disabled={generating}>
-                {generating ? 'Generating...' : captions.length ? 'Regenerate' : 'Generate captions'}
+                {generating ? 'Generating...' : captions.length ? 'Regenerate caption ideas' : 'Generate caption ideas'}
               </button>
-              <button style={s.btn('default')} onClick={() => { setWriteOwn(true); setSelectedCaption(''); setEditedCaption(''); setGenError(''); setCaptions([]); }}>Write my own</button>
+              <button style={s.btn('default')} onClick={() => { setWriteOwn(true); setSelectedCaption(''); setEditedCaption(''); setGenError(''); setCaptions([]); }}>Write my own caption</button>
               {genError && <span style={{ fontSize: 13, color: '#c0392b' }}>Caption generation is temporarily unavailable — please contact Rowan.</span>}
             </div>
             {generating && <div style={{ textAlign: 'center', padding: 24, color: '#888', fontSize: 14 }}>Writing captions in the Garden Express voice...</div>}
