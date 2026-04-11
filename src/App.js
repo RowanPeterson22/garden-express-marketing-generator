@@ -704,45 +704,50 @@ export default function App() {
             )}
             {selectedCaption && (
               <>
-                <span style={s.sectionLabel}>Edit caption</span>
-                <textarea
-                  id="captionTextarea"
-                  style={s.textarea}
-                  value={editedCaption}
-                  onChange={e => setEditedCaption(e.target.value)}
-                />
-                <div style={{ marginTop: 8, border: '1px solid #e0e8d8', borderRadius: 10, padding: '10px 12px', background: '#f9fbf7' }}>
-                  <div style={{ fontSize: 12, color: '#888', marginBottom: 8, fontWeight: 500 }}>Tap an emoji to insert at cursor</div>
-                  {[
-                    { label: 'Plants', emojis: ['🌿','🌱','🍃','🌾','🌵','🎋','🎍','🪴','🌲','🌳','🌴'] },
-                    { label: 'Flowers', emojis: ['🌸','🌺','🌻','🌹','🌷','💐','🪷','🏵️'] },
-                    { label: 'Garden & Nature', emojis: ['🌍','☀️','🌤️','🌧️','💧','🌈','🍂','🍁','❄️','🌙'] },
-                    { label: 'Food & Edibles', emojis: ['🍓','🫐','🍋','🍅','🧄','🥕','🌽','🍎','🫒','🍇'] },
-                    { label: 'Lifestyle', emojis: ['🏡','✨','💚','💛','🤎','👩‍🌾','🧑‍🌾','🪻','🦋','🐝'] },
-                  ].map(group => (
-                    <div key={group.label} style={{ marginBottom: 8 }}>
-                      <div style={{ fontSize: 11, color: '#aaa', marginBottom: 4 }}>{group.label}</div>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-                        {group.emojis.map(emoji => (
-                          <button
-                            key={emoji}
-                            onClick={() => {
-                              const ta = document.getElementById('captionTextarea');
-                              if (!ta) { setEditedCaption(prev => prev + emoji); return; }
-                              const start = ta.selectionStart;
-                              const end = ta.selectionEnd;
-                              const newVal = editedCaption.slice(0, start) + emoji + editedCaption.slice(end);
-                              setEditedCaption(newVal);
-                              setTimeout(() => { ta.focus(); ta.setSelectionRange(start + emoji.length, start + emoji.length); }, 0);
-                            }}
-                            style={{ background: '#fff', border: '1px solid #e0e8d8', borderRadius: 6, padding: '4px 6px', fontSize: 18, cursor: 'pointer', lineHeight: 1 }}
-                          >
-                            {emoji}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
+                <div style={{ border: '1px solid #c8dfc0', borderRadius: 12, padding: '14px', background: '#f4faf0', marginTop: 4 }}>
+                  <span style={{ ...s.sectionLabel, marginTop: 0, marginBottom: 8, display: 'block', color: '#2d7a4f' }}>Edit caption</span>
+                  <textarea
+                    id="captionTextarea"
+                    style={{ ...s.textarea, background: '#fff' }}
+                    value={editedCaption}
+                    onChange={e => setEditedCaption(e.target.value)}
+                  />
+                  <div style={{ marginTop: 8 }}>
+                    {[
+                      { label: 'Plants', first: '🌿', emojis: ['🌿','🌱','🍃','🌾','🌵','🎋','🎍','🪴','🌲','🌳','🌴'] },
+                      { label: 'Flowers', first: '🌸', emojis: ['🌸','🌺','🌻','🌹','🌷','💐','🪷','🏵️'] },
+                      { label: 'Garden & Nature', first: '☀️', emojis: ['🌍','☀️','🌤️','🌧️','💧','🌈','🍂','🍁','❄️','🌙'] },
+                      { label: 'Food & Edibles', first: '🍓', emojis: ['🍓','🫐','🍋','🍅','🧄','🥕','🌽','🍎','🫒','🍇'] },
+                      { label: 'Lifestyle', first: '✨', emojis: ['🏡','✨','💚','💛','🤎','👩‍🌾','🧑‍🌾','🪻','🦋','🐝'] },
+                    ].map(group => (
+                      <details key={group.label} style={{ marginBottom: 6, borderRadius: 8, border: '1px solid #e0e8d8', background: '#fff', overflow: 'hidden' }}>
+                        <summary style={{ padding: '7px 12px', fontSize: 13, cursor: 'pointer', listStyle: 'none', display: 'flex', alignItems: 'center', gap: 7, userSelect: 'none', color: '#555' }}>
+                          <span style={{ fontSize: 17 }}>{group.first}</span>
+                          <span>{group.label}</span>
+                          <span style={{ marginLeft: 'auto', fontSize: 11, color: '#bbb' }}>▾</span>
+                        </summary>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, padding: '8px 12px 10px' }}>
+                          {group.emojis.map(emoji => (
+                            <button
+                              key={emoji}
+                              onClick={() => {
+                                const ta = document.getElementById('captionTextarea');
+                                if (!ta) { setEditedCaption(prev => prev + emoji); return; }
+                                const start = ta.selectionStart;
+                                const end = ta.selectionEnd;
+                                const newVal = editedCaption.slice(0, start) + emoji + editedCaption.slice(end);
+                                setEditedCaption(newVal);
+                                setTimeout(() => { ta.focus(); ta.setSelectionRange(start + emoji.length, start + emoji.length); }, 0);
+                              }}
+                              style={{ background: '#f9fbf7', border: '1px solid #e0e8d8', borderRadius: 6, padding: '4px 6px', fontSize: 18, cursor: 'pointer', lineHeight: 1 }}
+                            >
+                              {emoji}
+                            </button>
+                          ))}
+                        </div>
+                      </details>
+                    ))}
+                  </div>
                 </div>
                 <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
                   <button style={s.btn('default')} onClick={() => setStep(1)}>Back</button>
