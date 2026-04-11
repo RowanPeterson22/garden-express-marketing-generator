@@ -556,7 +556,7 @@ export default function App() {
     step: (active, done) => ({ flex: 1, padding: '11px 8px', textAlign: 'center', fontSize: 13, color: done ? BRAND.green : active ? '#1a1a1a' : '#999', background: active ? '#fff' : '#f7f9f5', fontWeight: active ? 500 : 400, borderRight: '1px solid #e0e8d8' }),
     card: { background: '#fff', border: '1px solid #e0e8d8', borderRadius: 14, padding: 20 },
     sectionLabel: { fontSize: 13, fontWeight: 500, color: '#666', marginBottom: 8, marginTop: 16, display: 'block' },
-    input: { width: '100%', padding: '9px 12px', fontSize: 14, border: '1px solid #e0e8d8', borderRadius: 8, fontFamily: BRAND.font, color: '#1a1a1a', background: '#fff', outline: 'none' },
+    input: { width: '100%', padding: '9px 12px', fontSize: 14, border: '1px solid #e0e8d8', borderRadius: 8, fontFamily: BRAND.font, color: '#1a1a1a', background: '#fff', outline: 'none', boxSizing: 'border-box' },
     pill: (active) => ({ padding: '6px 14px', border: `1px solid ${active ? BRAND.green : '#e0e8d8'}`, borderRadius: 20, fontSize: 13, cursor: 'pointer', background: active ? BRAND.green : '#fff', color: active ? '#fff' : '#666', fontFamily: BRAND.font }),
     btn: (variant) => ({ padding: '10px 20px', border: `1px solid ${variant === 'primary' ? BRAND.green : '#ccc'}`, borderRadius: 8, background: variant === 'primary' ? BRAND.green : '#fff', color: variant === 'primary' ? '#fff' : '#666', fontSize: 14, cursor: 'pointer', fontFamily: BRAND.font, fontWeight: 500 }),
     productGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 12, marginBottom: 16 },
