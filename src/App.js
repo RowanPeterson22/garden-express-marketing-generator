@@ -2,6 +2,41 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import ReactCrop from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 
+const VB_BRANDS = [
+  {
+    id: 'garden_express',
+    name: 'Garden Express',
+    tagline: 'Online nursery — plants delivered to your door',
+    emoji: '🌿',
+    channelIds: ['69d868c6031bfa423cea3db2', '69d869a3031bfa423cea42bf'],
+    channels: ['Instagram @garden_express', 'Facebook @Garden Express'],
+  },
+  {
+    id: 'wollemi_pine',
+    name: 'Wollemi Pine',
+    tagline: 'Ancient living fossil — rare and remarkable',
+    emoji: '🌲',
+    channelIds: ['69da1828031bfa423cf15224', '69da184d031bfa423cf1526e'],
+    channels: ['Instagram @wollemipine_au', 'Facebook @Wollemi Pine'],
+  },
+  {
+    id: 'ge_giftshop',
+    name: 'GE Nursery & Gift Shop',
+    tagline: 'Plants, gifts and garden inspiration',
+    emoji: '🎁',
+    channelIds: ['69da13bf031bfa423cf14699', '69da13eb031bfa423cf1471a'],
+    channels: ['Instagram @ge_giftshop', 'Facebook @GE Nursery & Giftshop'],
+  },
+  {
+    id: 'urban_foliage',
+    name: 'Urban Foliage',
+    tagline: 'Indoor plants for modern living',
+    emoji: '🪴',
+    channelIds: ['69da18cb031bfa423cf1537d', '69da18ee031bfa423cf153d7'],
+    channels: ['Instagram @urbanfoliageaus', 'Facebook @Urban Foliage'],
+  },
+];
+
 const BRAND = {
   green: '#70b738',
   pink: '#ab0a62',
@@ -94,6 +129,7 @@ function PasswordScreen({ onUnlock }) {
 export default function App() {
   const [authed, setAuthed] = useState(() => sessionStorage.getItem('ge_auth') === 'true');
   const [module, setModule] = useState(null);
+  const [activeBrand, setActiveBrand] = useState(null);
   const [step, setStep] = useState(1);
   const [bufferChannels, setBufferChannels] = useState([]);
   const [bufferChannelsLoaded, setBufferChannelsLoaded] = useState(false);
@@ -265,6 +301,47 @@ export default function App() {
     return matchesSearch && matchesCat;
   });
 
+  });
+
+  if (module === 'brand') return (
+    <div style={{ fontFamily: BRAND.font, minHeight: '100vh', background: '#f7f9f5', color: '#1a1a1a' }}>
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+      <div style={{ background: '#fff', borderBottom: '1px solid #e8e8e0', padding: '0 24px', display: 'flex', alignItems: 'center', height: 56, gap: 12 }}>
+        <div style={{ width: 28, height: 28, borderRadius: '50%', background: BRAND.green, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <span style={{ fontSize: 16 }}>🌿</span>
+        </div>
+        <span style={{ fontSize: 16, fontWeight: 600, color: '#1a1a1a' }}>Social Studio</span>
+        <span style={{ fontSize: 13, color: '#888', marginLeft: 4 }}>Select a brand</span>
+        <div style={{ marginLeft: 'auto' }}>
+          <div style={{ fontSize: 13, color: '#666', cursor: 'pointer', padding: '5px 12px', border: '1px solid #e0e8d8', borderRadius: 8, background: '#f7f9f5' }} onClick={() => setModule(null)}>← All tools</div>
+        </div>
+      </div>
+      <div style={{ maxWidth: 640, margin: '0 auto', padding: '32px 20px' }}>
+        <div style={{ fontSize: 20, fontWeight: 600, marginBottom: 6 }}>Which brand are you posting for?</div>
+        <div style={{ fontSize: 14, color: '#888', marginBottom: 24 }}>Select a brand to load its social channels and settings.</div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          {VB_BRANDS.map(brand => (
+            <div key={brand.id} onClick={() => { setActiveBrand(brand); setModule('social'); }}
+              style={{ background: '#fff', border: '1px solid #e0e8d8', borderRadius: 16, padding: '20px 18px', cursor: 'pointer', transition: 'border-color 0.15s' }}
+              onMouseEnter={e => e.currentTarget.style.borderColor = BRAND.green}
+              onMouseLeave={e => e.currentTarget.style.borderColor = '#e0e8d8'}>
+              <div style={{ fontSize: 36, marginBottom: 10 }}>{brand.emoji}</div>
+              <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 4 }}>{brand.name}</div>
+              <div style={{ fontSize: 12, color: '#888', lineHeight: 1.4, marginBottom: 10 }}>{brand.tagline}</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                {brand.channels.map(ch => (
+                  <div key={ch} style={{ fontSize: 11, color: '#aaa' }}>📲 {ch}</div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
   if (!module) return (
     <div style={{ fontFamily: BRAND.font, minHeight: '100vh', background: '#f7f9f5', color: '#1a1a1a' }}>
       <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -283,7 +360,7 @@ export default function App() {
           <div style={{ fontSize: 14, color: '#888' }}>Choose a tool to get started</div>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-          <div onClick={() => setModule('social')} style={{ background: '#fff', border: `2px solid ${BRAND.green}`, borderRadius: 16, padding: '32px 24px', cursor: 'pointer', textAlign: 'center' }}
+          <div onClick={() => setModule('brand')} style={{ background: '#fff', border: `2px solid ${BRAND.green}`, borderRadius: 16, padding: '32px 24px', cursor: 'pointer', textAlign: 'center' }}
             onMouseEnter={e => e.currentTarget.style.background = '#f0f9e8'}
             onMouseLeave={e => e.currentTarget.style.background = '#fff'}>
             <div style={{ fontSize: 40, marginBottom: 16 }}>📱</div>
@@ -382,6 +459,8 @@ export default function App() {
 
   const startOver = () => {
     setStep(1);
+    setModule('brand');
+    setActiveBrand(null);
     setSelectedProduct(null);
     setSearchQuery('');
     setSelectedCategory('All');
@@ -410,6 +489,8 @@ export default function App() {
     setSelectedChannels([]);
     setBufferResult(null);
     setCaptionCopied(false);
+    setBufferChannels([]);
+    setBufferChannelsLoaded(false);
   };
 
   const regenerateSingleCaption = async (index) => {
@@ -439,14 +520,18 @@ export default function App() {
 
   const loadBufferChannels = async () => {
     try {
-      const res = await fetch('/api/buffer-channels');
+      const brandChannelIds = activeBrand?.channelIds?.join(',') || '';
+      const url = brandChannelIds ? `/api/buffer-channels?channelIds=${brandChannelIds}` : '/api/buffer-channels';
+      const res = await fetch(url);
       const data = await res.json();
       console.log('Buffer channels response:', data);
       if (data.channels) {
         setBufferChannels(data.channels);
         setBufferChannelsLoaded(true);
+        // Auto-select all channels for this brand
+        setSelectedChannels(data.channels.map(ch => ch.id));
       } else {
-        setBufferChannelsLoaded(true); // mark as loaded even on error so UI updates
+        setBufferChannelsLoaded(true);
         alert('Buffer error: ' + (data.error || 'Unknown error'));
       }
       if (data.expiryWarning) setBufferExpiry(data.expiryWarning);
@@ -650,10 +735,11 @@ export default function App() {
         <div style={s.headerDot}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5"><path d="M12 2a9 9 0 0 1 9 9c0 4.97-9 13-9 13S3 15.97 3 11a9 9 0 0 1 9-9z"/><circle cx="12" cy="11" r="3"/></svg>
         </div>
-        <span style={{ fontSize: 16, fontWeight: 600, color: '#1a1a1a' }}>Garden Express</span>
+        <span style={{ fontSize: 16, fontWeight: 600, color: '#1a1a1a' }}>{activeBrand?.name || 'Garden Express'}</span>
         <span style={{ fontSize: 13, color: '#888', marginLeft: 4 }}>Social post creator</span>
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center' }}>
           {step > 1 && <div style={{ fontSize: 13, color: '#888', cursor: 'pointer', padding: '5px 12px', border: '1px solid #e0e8d8', borderRadius: 8, background: '#f7f9f5' }} onClick={startOver}>Start over</div>}
+          <div style={{ fontSize: 13, color: '#666', cursor: 'pointer', padding: '5px 12px', border: '1px solid #e0e8d8', borderRadius: 8, background: '#f7f9f5' }} onClick={() => { setModule('brand'); setStep(1); setSelectedProduct(null); }}>← Change brand</div>
           <div style={{ fontSize: 13, color: '#666', cursor: 'pointer', padding: '5px 12px', border: '1px solid #e0e8d8', borderRadius: 8, background: '#f7f9f5' }} onClick={() => { setModule(null); setStep(1); setSelectedProduct(null); }}>← All tools</div>
         </div>
       </div>

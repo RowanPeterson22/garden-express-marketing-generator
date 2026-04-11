@@ -72,17 +72,20 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: channelsData.errors[0]?.message || 'Failed to fetch channels' });
     }
 
-    const allowedIds = process.env.BUFFER_CHANNEL_IDS_VB
+    const queryChannelIds = req.query?.channelIds
+      ? req.query.channelIds.split(',').map(id => id.trim())
+      : null;
+
+    const vbIds = process.env.BUFFER_CHANNEL_IDS_VB
       ? process.env.BUFFER_CHANNEL_IDS_VB.split(',').map(id => id.trim())
       : null;
 
-    // Default to GE channels only until multi-brand switcher is built
-    const GE_CHANNEL_IDS = ['69d868c6031bfa423cea3db2', '69d869a3031bfa423cea42bf'];
+    // Filter by brand-specific IDs if provided, otherwise fall back to VB ids
+    const allowedIds = queryChannelIds || vbIds;
 
     const channels = (channelsData.data?.channels || [])
       .filter(ch => !ch.isLocked)
       .filter(ch => !allowedIds || allowedIds.includes(ch.id))
-      .filter(ch => GE_CHANNEL_IDS.includes(ch.id))
       .map(ch => ({
         id: ch.id,
         name: ch.displayName || ch.name,
