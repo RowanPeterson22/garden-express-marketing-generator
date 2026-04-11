@@ -402,17 +402,18 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           caption: stateRef.current.editedCaption || '',
-          imageDataUrl: dataUrl,
           channelIds: selectedChannels,
         }),
       });
       const data = await res.json();
+      alert('Buffer response: ' + JSON.stringify(data));
       if (data.success) {
         setBufferResult({ success: true, message: 'Added to Buffer queue ✓' });
       } else {
-        setBufferResult({ success: false, message: data.error || 'Failed to send to Buffer' });
+        setBufferResult({ success: false, message: data.message || data.error || 'Failed to send to Buffer' });
       }
     } catch (e) {
+      alert('Buffer error: ' + e.message);
       setBufferResult({ success: false, message: 'Failed to send to Buffer' });
     }
     setBufferSending(false);
